@@ -1,0 +1,2 @@
+# Magisterka
+najlepsza magisterka ever
