@@ -13,3 +13,7 @@ GITHUBS
 https://github.com/llSourcell/how_to_generate_video - kod śmiesznego kolesia
 https://github.com/niazangels/vae-pokedex - generowanie pokemonów
 https://github.com/Nemzy/video_generator - generowanie filmików
+
+SUPER RESOLUTION GANs
+https://github.com/tadax/srgan
+- TensorFlow + VGG19 + Imagenet
