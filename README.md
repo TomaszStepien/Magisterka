@@ -17,3 +17,6 @@ https://github.com/Nemzy/video_generator - generowanie filmików
 SUPER RESOLUTION GANs
 https://github.com/tadax/srgan
 - TensorFlow + VGG19 + Imagenet
+
+GAN Keras
+https://github.com/eriklindernoren/Keras-GAN#installation
