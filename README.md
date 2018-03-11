@@ -3,6 +3,7 @@ najlepsza magisterka ever
 
 # Resources
 google drive: https://drive.google.com/drive/folders/0B5Qah_avIRO0NUxVT2JlNTF3Rms?usp=sharing
+
 google GPU : https://hackernoon.com/train-your-machine-learning-models-on-googles-gpus-for-free-forever-a41bd309d6ad
 
 # TUTORIALS
