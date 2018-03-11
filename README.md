@@ -20,3 +20,25 @@ https://github.com/tadax/srgan
 
 GAN Keras
 https://github.com/eriklindernoren/Keras-GAN#installation
+
+POTENCJALNE ROZDZIAŁY PRACY MAGISTERSKIEJ
+-------------
+1. Sieci neuronowe + konwolucyjne sieci neuronowe *- część teoretyczna*
+* zbiory danych (opisanie tego, że potrzebna jest dobra jakość + duża ilość obiektów)
+* opisanie tego, że algorytmy rozwijają się w stronę potrzebowania coraz mniejszej ilości zdjęć, ponieważ mają zaimplementowane funkcje, które pozwalają je preprocesować
+2. Data augumentation *- część teoretyczna*
+* preprocesowanie zdjęcia przed zastosowaniem algorytmu sieci neuronowej
+* zwiększenie jakości zbioru
+* rotowanie zdjęć - zwiększenie ilości zdjęć w zbiorze, ALE kosztem gubienia jakości
+3. Super resolution GANs *- część teoretyczna*
+* zbudowanie sieci neuronowej pozwalającej na zwiększenie jakości zbioru danych
+  * *nie wiem czy budować to od nowa, czy posłużyć się gotową siecią z githuba*
+* rotowanie zdjęć i zwiększenie ich jakości sieciami GAN
+  * *opis koncepcji*
+4. Porównanie efektów *- czyli zastosowanie opisanych powyżej rzeczy w praktyce*
+* zbudowanie klasyfikatora na zbiorze danych bez zrotowanych zdjęć
+  * ALBO zbudowanie klasyfikatora na zbiorze danych ze zrotowanymi zdjęciami, ale bez zastosowania Super resolution GANs
+  * *Klasyfikator chyba najlepiej i najwygodniej zbudować w bibliotece fast.ai *
+* zbudowanie klasyfikatora na zbiorze danych ze zrotowanymi zdjęciami i z zastosowaniem super resolution GANs
+* porównanie wyników
+* wyciągnięcie wniosków
