@@ -3,6 +3,9 @@ najlepsza magisterka ever
 
 dysk G: https://drive.google.com/drive/folders/0B5Qah_avIRO0NUxVT2JlNTF3Rms?usp=sharing
 
+TUTORIALS
+http://course.fast.ai/
+
 VIDEOS
 -------------
 https://www.youtube.com/watch?v=-E2N1kQc8MM - Generating videos ze śmiesznym kolesiem
