@@ -33,6 +33,7 @@ POTENCJALNE ROZDZIAŁY PRACY MAGISTERSKIEJ
 * zbiory danych (opisanie tego, że potrzebna jest dobra jakość + duża ilość obiektów)
 * opisanie tego, że algorytmy rozwijają się w stronę potrzebowania coraz mniejszej ilości zdjęć, ponieważ mają zaimplementowane funkcje, które pozwalają je preprocesować
 2. Data augumentation *- część teoretyczna*
+* opis problemu: mała ilość danych, problem ze zbiorami, które nie są zbilansowane (np. jest 100 kotów i 10000 psów)
 * preprocesowanie zdjęcia przed zastosowaniem algorytmu sieci neuronowej
 * zwiększenie jakości zbioru
 * rotowanie zdjęć - zwiększenie ilości zdjęć w zbiorze, ALE kosztem gubienia jakości
