@@ -48,3 +48,19 @@ POTENCJALNE ROZDZIAŁY PRACY MAGISTERSKIEJ
 * zbudowanie klasyfikatora na zbiorze danych ze zrotowanymi zdjęciami i z zastosowaniem super resolution GANs
 * porównanie wyników
 * wyciągnięcie wniosków
+
+PLAN DZIAŁANIA
+-------------
+1. Postawić maszynę EC2 p2.xlarge (Deep Learning AMI version 10.0)
+2. Połączyć repozytorium z AWSem
+3. Postawić środowisko pytorch_mgr
+4. Zainstalować na środowisku pytorch_mgr:
+* gany
+* fast.ai 
+5. Pobrać dane (pieski/kotki) i wrzucić je na AWS
+6. Skonstruować workflow do trenowania sieci klasyfikujących obrazki
+7. Skonstruować workflow do trenowania ganów
+8. Skonstruować workflow z kolejnymi etapami (w pętli):
+* sieć konstruująca obrazki
+* sieć klasyfikująca obrazki
+* dodanie wyników do data frame
