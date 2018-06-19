@@ -9,13 +9,13 @@ https://keras.io/getting-started/sequential-model-guide/
 """
 
 import os
-
+from random import shuffle
 import numpy as np
 from keras.preprocessing.image import img_to_array, load_img
 from keras.utils import to_categorical
 
 
-def load_images_into_array(path, pic_size=(20, 20)):
+def load_images_into_array(path, pic_size=(20, 20), sample_size=0):
     """iterates over a directory and reads all images
     into an ndarray with dimensions (nfiles, width, height, 3)
     assumes all files in the given directory are images
@@ -23,10 +23,16 @@ def load_images_into_array(path, pic_size=(20, 20)):
     :return: ndarray - 4d (nfiles, width, height, 3)
     """
     files = os.listdir(path)
+    if sample_size > len(files):
+        print("sample_size > len(files)")
+        sample_size %= len(files)
+    if sample_size > 0:
+        shuffle(files)
+        files = files[0:sample_size]
     return np.stack([img_to_array(load_img(f"{path}//{file}", target_size=pic_size)) for file in files], axis=0)
 
 
-def load_sets(train_path, valid_path, pic_size=(20, 20)):
+def load_sets(train_path, valid_path, pic_size=(20, 20), train_sample_size=0, valid_sample_size=0):
     """reads cats and dogs into keras friendly arrays
 
     :return: tuple of ndarrays (x_train, y_train, x_valid, y_valid)
@@ -37,10 +43,10 @@ def load_sets(train_path, valid_path, pic_size=(20, 20)):
     if valid_path[-1] != '\\':
         valid_path = valid_path + '\\'
 
-    train_cats = load_images_into_array(path=f"{train_path}cats", pic_size=pic_size)
-    train_doggos = load_images_into_array(path=f"{train_path}dogs", pic_size=pic_size)
-    valid_cats = load_images_into_array(path=f"{valid_path}cats", pic_size=pic_size)
-    valid_doggos = load_images_into_array(path=f"{valid_path}dogs", pic_size=pic_size)
+    train_cats = load_images_into_array(path=f"{train_path}cats", pic_size=pic_size, sample_size=train_sample_size)
+    train_doggos = load_images_into_array(path=f"{train_path}dogs", pic_size=pic_size, sample_size=train_sample_size)
+    valid_cats = load_images_into_array(path=f"{valid_path}cats", pic_size=pic_size, sample_size=valid_sample_size)
+    valid_doggos = load_images_into_array(path=f"{valid_path}dogs", pic_size=pic_size, sample_size=valid_sample_size)
 
     x_train = np.concatenate((train_cats, train_doggos), axis=0)
     x_valid = np.concatenate((valid_cats, valid_doggos), axis=0)
@@ -61,3 +67,13 @@ def load_sets(train_path, valid_path, pic_size=(20, 20)):
     y_valid = to_categorical(valid_labels, num_classes=2)
 
     return x_train, y_train, x_valid, y_valid
+
+
+# test line
+# a, b, c, d = load_sets("C:\\magisterka_data\\dogscats\\train", "C:\\magisterka_data\\dogscats\\train", (20, 20), 1000,
+#                        100)
+#
+# print(a)
+# print(b)
+# print(c)
+# print(d)
