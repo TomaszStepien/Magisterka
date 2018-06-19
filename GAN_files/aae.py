@@ -1,11 +1,8 @@
 from __future__ import print_function, division
 
-from keras.datasets import mnist
-from keras.layers import Input, Dense, Reshape, Flatten, Dropout, multiply, GaussianNoise
-from keras.layers import BatchNormalization, Activation, Embedding, ZeroPadding2D
+from keras.layers import Input, Dense, Reshape, Flatten
 from keras.layers import MaxPooling2D, merge
 from keras.layers.advanced_activations import LeakyReLU
-from keras.layers.convolutional import UpSampling2D, Conv2D
 from keras.models import Sequential, Model
 from keras.optimizers import Adam
 from keras import losses
@@ -13,14 +10,14 @@ from keras.utils import to_categorical
 import keras.backend as K
 
 import matplotlib.pyplot as plt
-
 import numpy as np
 
+
 class AdversarialAutoencoder():
-    def __init__(self):
-        self.img_rows = 28
-        self.img_cols = 28
-        self.channels = 1
+    def __init__(self, pic_size, channels, num_classes):
+        self.img_rows = pic_size[0]
+        self.img_cols = pic_size[0]
+        self.channels = channels
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
         self.latent_dim = 10
 
@@ -107,14 +104,13 @@ class AdversarialAutoencoder():
 
         return Model(encoded_repr, validity)
 
-    def train(self, epochs, batch_size=128, sample_interval=50):
-
+    def train(self, X_train, epochs, batch_size=128, sample_interval=50):
         # Load the dataset
-        (X_train, _), (_, _) = mnist.load_data()
+        X_train = X_train
 
         # Rescale -1 to 1
-        X_train = (X_train.astype(np.float32) - 127.5) / 127.5
-        X_train = np.expand_dims(X_train, axis=3)
+        #X_train = (X_train.astype(np.float32) - 127.5) / 127.5
+        #X_train = np.expand_dims(X_train, axis=3)
 
         # Adversarial ground truths
         valid = np.ones((batch_size, 1))
@@ -147,8 +143,6 @@ class AdversarialAutoencoder():
 
             # Plot the progress
             print ("%d [D loss: %f, acc: %.2f%%] [G loss: %f, mse: %f]" % (epoch, d_loss[0], 100*d_loss[1], g_loss[0], g_loss[1]))
-
-            # If at save interval => save generated image samples
             if epoch % sample_interval == 0:
                 self.sample_images(epoch)
 
@@ -167,7 +161,7 @@ class AdversarialAutoencoder():
                 axs[i,j].imshow(gen_imgs[cnt, :,:,0], cmap='gray')
                 axs[i,j].axis('off')
                 cnt += 1
-        fig.savefig("images/mnist_%d.png" % epoch)
+        fig.savefig("images/dogs_%d.png" % epoch)
         plt.close()
 
     def save_model(self):
@@ -184,7 +178,3 @@ class AdversarialAutoencoder():
         save(self.generator, "aae_generator")
         save(self.discriminator, "aae_discriminator")
 
-
-if __name__ == '__main__':
-    aae = AdversarialAutoencoder()
-    aae.train(epochs=20000, batch_size=32, sample_interval=200)

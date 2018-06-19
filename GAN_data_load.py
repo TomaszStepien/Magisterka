@@ -14,6 +14,8 @@ import numpy as np
 from keras.preprocessing.image import img_to_array, load_img
 from keras.utils import to_categorical
 
+from PIL import Image
+
 
 def load_images_into_array(path, pic_size=(20, 20)):
     """iterates over a directory and reads all images
@@ -24,6 +26,10 @@ def load_images_into_array(path, pic_size=(20, 20)):
     """
     files = os.listdir(path)
     return np.stack([img_to_array(load_img(f"{path}//{file}", target_size=pic_size)) for file in files], axis=0)
+    #return np.stack([np.array(Image.open(f"{path}//{file}").convert("L").resize(pic_size, Image.ANTIALIAS)) \
+    #                 for file in files], axis=0)
+    #return np.stack([np.array(Image.open(f"{path}//{file}").resize(pic_size, Image.ANTIALIAS)) \
+    #                 for file in files], axis=0)
 
 
 def load_sets(train_path, valid_path, pic_size=(20, 20)):
@@ -51,9 +57,11 @@ def load_sets(train_path, valid_path, pic_size=(20, 20)):
     shuffle_train = np.random.permutation(x_train.shape[0])
     shuffle_valid = np.random.permutation(x_valid.shape[0])
 
+    #x_train = x_train[shuffle_train, :, :]
     x_train = x_train[shuffle_train, :, :, :]
     train_labels = train_labels[shuffle_train]
 
+    #x_valid = x_valid[shuffle_valid, :, :]
     x_valid = x_valid[shuffle_valid, :, :, :]
     valid_labels = valid_labels[shuffle_valid]
 
