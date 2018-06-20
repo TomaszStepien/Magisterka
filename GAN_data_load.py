@@ -5,13 +5,14 @@ todo: try https://keras.io/preprocessing/image/
 
 import os
 from random import shuffle
+import defaults
 
 import numpy as np
 from keras.preprocessing.image import img_to_array, load_img
 from keras.utils import to_categorical
 
 
-def load_images_into_array(path, pic_size=(20, 20), sample_size=-1):
+def load_images_into_array(path, pic_size=defaults.PIC_SIZE, sample_size=-1):
     """iterates over a directory and reads all images
     into an ndarray with dimensions (nfiles, width, height, 3)
     assumes all files in the given directory are images
@@ -27,7 +28,10 @@ def load_images_into_array(path, pic_size=(20, 20), sample_size=-1):
     return np.stack([img_to_array(load_img(f"{path}//{file}", target_size=pic_size)) for file in files], axis=0)
 
 
-def load_sets(path, pic_size=(20, 20), sample_size=(-1, -1), classes_to_read=('cats', 'dogs')):
+def load_sets(path=defaults.PATH,
+              pic_size=defaults.PIC_SIZE,
+              sample_size=(-1, -1),
+              classes_to_read=('cats', 'dogs')):
     """reads train and valid pictures into keras friendly arrays
     assumes that each class has a sepearate directory with a proper name
     eg.
@@ -36,6 +40,8 @@ def load_sets(path, pic_size=(20, 20), sample_size=(-1, -1), classes_to_read=('c
     C://magisterka_data//dogscats//valid//dogs
     C://magisterka_data//dogscats//valid//cats
 
+    :param pic_size:
+    :param path:
     :param classes_to_read: should match names of proper directories
     :param sample_size: tuple -1 means all images
     :return: tuple of ndarrays (x_train, y_train, x_valid, y_valid), shuffled
@@ -81,8 +87,38 @@ def load_sets(path, pic_size=(20, 20), sample_size=(-1, -1), classes_to_read=('c
 
     return x_train, y_train, x_valid, y_valid
 
+
+def load_all_pictures(path=defaults.PATH,
+                      pic_size=defaults.PIC_SIZE,
+                      sample_size=(-1, -1),
+                      classes_to_read=('cats', 'dogs')):
+    """
+    loads all pictures from a given directory to one 4d ndarray
+
+    :param path:
+    :param pic_size:
+    :param sample_size:
+    :param classes_to_read:
+    :return: ndarray (npictures, width, height, RGB)
+    """
+    if path[-1] != '\\':
+        path = path + '\\'
+
+    images = [load_images_into_array(path=f"{path}{v}\\{c}", pic_size=pic_size, sample_size=sample_size[0]) for c in
+              classes_to_read for v in ('train', 'valid')]
+    images = np.concatenate(images, axis=0)
+
+    return images
+
+
+def augment_sets(x_train, y_train, x_valid, y_valid):
+    """work in progress"""
+    # todo: implement https://keras.io/preprocessing/image/
+    return x_train, y_train, x_valid, y_valid
+
+
 # test cases ====================================================================================
-# a, b, c, d = load_sets("C:\\magisterka_data\\dogscats\\", pic_size=(20, 20), sample_size=(-1, -1),
+# a, b, c, d = load_sets(defaults.PATH, defaults.PIC_SIZE, sample_size=(-1, -1),
 #                        classes_to_read=('dogs', 'cats'))
 #
 # print(a.shape == (23000, 20, 20, 3))
@@ -90,7 +126,7 @@ def load_sets(path, pic_size=(20, 20), sample_size=(-1, -1), classes_to_read=('c
 # print(c.shape == (2000, 20, 20, 3))
 # print(d.shape == (2000, 2))
 #
-# a, b, c, d = load_sets("C:\\magisterka_data\\dogscats\\", pic_size=(20, 20), sample_size=(-1, -1),
+# a, b, c, d = load_sets(defaults.PATH, defaults.PIC_SIZE, sample_size=(-1, -1),
 #                        classes_to_read=['dogs'])
 #
 # print(a.shape == (11500, 20, 20, 3))
@@ -98,7 +134,7 @@ def load_sets(path, pic_size=(20, 20), sample_size=(-1, -1), classes_to_read=('c
 # print(c.shape == (1000, 20, 20, 3))
 # print(d.shape == (1000, 1))
 #
-# a, b, c, d = load_sets("C:\\magisterka_data\\dogscats\\", pic_size=(20, 20), sample_size=(1000, 1000),
+# a, b, c, d = load_sets(defaults.PATH, defaults.PIC_SIZE, sample_size=(1000, 1000),
 #                        classes_to_read=('dogs', 'cats'))
 #
 # print(a.shape == (2000, 20, 20, 3))
