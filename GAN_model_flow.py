@@ -9,15 +9,15 @@ import numpy as np
 # import GAN_model_train as mt
 
 # Dataset variables
-PIC_SIZE = (32, 32)
+PIC_SIZE = (100, 100)
 TRAIN_PATH = 'C://magisterka_data//dogscats'
 CHANNELS = 3
 NUM_CLASSES = 1
 
 # GAN model training variables
-EPOCHS = 10000  # todo
-BATCH_SIZE = 32
-SAMPLE_INTERVAL = 100
+EPOCHS = 1000000  # todo
+BATCH_SIZE = 100
+SAMPLE_INTERVAL = 1000
 
 # Load dataset
 print("LOADING DATASET")

@@ -11,7 +11,8 @@ import keras.backend as K
 
 import matplotlib.pyplot as plt
 import numpy as np
-
+import datetime
+import os
 
 class AdversarialAutoencoder():
     def __init__(self, pic_size, channels, num_classes):
@@ -105,12 +106,12 @@ class AdversarialAutoencoder():
         return Model(encoded_repr, validity)
 
     def train(self, X_train, epochs, batch_size=128, sample_interval=50):
-        # Load the dataset
-        X_train = X_train
+        start_time = datetime.datetime.now()
+        folder_name = start_time.strftime("%Y_%m_%d__%H_%M")
+        if not os.path.exists(f"images/{folder_name}"):
+            os.makedirs(f"images/{folder_name}")
 
-        # Rescale -1 to 1
-        #X_train = (X_train.astype(np.float32) - 127.5) / 127.5
-        #X_train = np.expand_dims(X_train, axis=3)
+        X_train = X_train
 
         # Adversarial ground truths
         valid = np.ones((batch_size, 1))
@@ -142,11 +143,12 @@ class AdversarialAutoencoder():
             g_loss = self.adversarial_autoencoder.train_on_batch(imgs, [imgs, valid])
 
             # Plot the progress
-            print ("%d [D loss: %f, acc: %.2f%%] [G loss: %f, mse: %f]" % (epoch, d_loss[0], 100*d_loss[1], g_loss[0], g_loss[1]))
+            computation_time = str(datetime.datetime.now()-start_time)
+            print ("%d [D loss: %f, acc: %.2f%%] [G loss: %f, mse: %f] exec.time: %s" % (epoch, d_loss[0], 100*d_loss[1], g_loss[0], g_loss[1], computation_time))
             if epoch % sample_interval == 0:
-                self.sample_images(epoch)
+                self.sample_images(epoch, folder_name=folder_name, computation_time=computation_time)
 
-    def sample_images(self, epoch):
+    def sample_images(self, epoch, folder_name, computation_time):
         r, c = 5, 5
 
         z = np.random.normal(size=(r*c, self.latent_dim))
@@ -161,7 +163,7 @@ class AdversarialAutoencoder():
                 axs[i,j].imshow(gen_imgs[cnt, :,:])
                 axs[i,j].axis('off')
                 cnt += 1
-        fig.savefig("images/dogs_%d.png" % epoch)
+        fig.savefig(f"images/{folder_name}/{epoch}.png")
         plt.close()
 
     def save_model(self):
