@@ -15,12 +15,12 @@ import sys
 import numpy as np
 
 class GAN():
-    def __init__(self):
-        self.img_rows = 28
-        self.img_cols = 28
-        self.channels = 1
+    def __init__(self, pic_size, channels, num_classes):
+        self.img_rows = pic_size[0]
+        self.img_cols = pic_size[0]
+        self.channels = channels
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
-        self.latent_dim = 100
+        self.latent_dim = 10
 
         optimizer = Adam(0.0002, 0.5)
 
@@ -89,12 +89,10 @@ class GAN():
 
         return Model(img, validity)
 
-    def train(self, epochs, batch_size=128, sample_interval=50):
+    def train(self, X_train, epochs, batch_size=128, sample_interval=50):
 
         # Load the dataset
-        (X_train, _), (_, _) = mnist.load_data()
-
-
+        X_train = X_train
 
         print(type(X_train))
 

@@ -27,12 +27,8 @@ def load_images_into_array(path, pic_size=defaults.PIC_SIZE, sample_size=-1):
     elif sample_size > 0:
         shuffle(files)
         files = files[0:sample_size]
-    return np.stack([img_to_array(load_img(f"{path}//{file}", target_size=pic_size)) for file in files], axis=0)
-    #return np.stack([np.array(Image.open(f"{path}//{file}").convert("L").resize(pic_size, Image.ANTIALIAS)) \
-    #                 for file in files], axis=0)
-    #return np.stack([np.array(Image.open(f"{path}//{file}").resize(pic_size, Image.ANTIALIAS)) \
-    #                 for file in files], axis=0)
-
+    return np.stack([img_to_array(load_img(f"{path}//{file}", target_size=pic_size))/127.5 - 1. for file in files],
+                    axis=0)
 
 def load_sets(path=defaults.PATH,
               pic_size=defaults.PIC_SIZE,
@@ -82,12 +78,12 @@ def load_sets(path=defaults.PATH,
     shuffle_train = np.random.permutation(x_train.shape[0])
     shuffle_valid = np.random.permutation(x_valid.shape[0])
 
-    #x_train = x_train[shuffle_train, :, :]
-    x_train = x_train[shuffle_train, :, :, :]
+    x_train = x_train[shuffle_train, :, :]
+    #x_train = x_train[shuffle_train, :, :, :]
     y_train = y_train[shuffle_train]
 
-    #x_valid = x_valid[shuffle_valid, :, :]
-    x_valid = x_valid[shuffle_valid, :, :, :]
+    x_valid = x_valid[shuffle_valid, :, :]
+    #x_valid = x_valid[shuffle_valid, :, :, :]
     y_valid = y_valid[shuffle_valid]
 
     y_train = to_categorical(y_train, num_classes=len(classes_to_read))
