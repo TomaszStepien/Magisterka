@@ -1,25 +1,24 @@
 """implements a simple GAN for dogscats pictures"""
 
 import numpy as np
-from GAN_data_load import load_sets
+from GAN_data_load import load_all_pictures
 
-x_train, y_train, x_valid, y_valid = load_sets()
+real_pics = load_all_pictures()
 
 # %%
-print(x_train)
-print(y_train)
-print(x_valid)
-print(y_valid)
+print(real_pics.shape)
 
 
 # %%
 class TomaszGAN:
     """simplest GAN, trained to discriminate between real and fake images only"""
 
-    def __init__(self, images):
-        self.real_images = images
+    def __init__(self, real_images):
+        self.real_images = real_images
 
-    def generate_fake_images(self):
+    def generate_fake_images(self, npics, picsize=(20,20)):
+        """generate random noise"""
+
         pass
 
     def generate_real_fake_set(self):

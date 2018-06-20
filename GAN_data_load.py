@@ -118,26 +118,26 @@ def augment_sets(x_train, y_train, x_valid, y_valid):
 
 
 # test cases ====================================================================================
-a, b, c, d = load_sets(defaults.PATH, defaults.PIC_SIZE, sample_size=(-1, -1),
-                       classes_to_read=('dogs', 'cats'))
-
-print(a.shape == (23000, 20, 20, 3))
-print(b.shape == (23000, 2))
-print(c.shape == (2000, 20, 20, 3))
-print(d.shape == (2000, 2))
-
-a, b, c, d = load_sets(defaults.PATH, defaults.PIC_SIZE, sample_size=(-1, -1),
-                       classes_to_read=['dogs'])
-
-print(a.shape == (11500, 20, 20, 3))
-print(b.shape == (11500, 1))
-print(c.shape == (1000, 20, 20, 3))
-print(d.shape == (1000, 1))
-
-a, b, c, d = load_sets(defaults.PATH, defaults.PIC_SIZE, sample_size=(1000, 1000),
-                       classes_to_read=('dogs', 'cats'))
-
-print(a.shape == (2000, 20, 20, 3))
-print(b.shape == (2000, 2))
-print(c.shape == (2000, 20, 20, 3))
-print(d.shape == (2000, 2))
+# a, b, c, d = load_sets(defaults.PATH, defaults.PIC_SIZE, sample_size=(-1, -1),
+#                        classes_to_read=('dogs', 'cats'))
+#
+# print(a.shape == (23000, 20, 20, 3))
+# print(b.shape == (23000, 2))
+# print(c.shape == (2000, 20, 20, 3))
+# print(d.shape == (2000, 2))
+#
+# a, b, c, d = load_sets(defaults.PATH, defaults.PIC_SIZE, sample_size=(-1, -1),
+#                        classes_to_read=['dogs'])
+#
+# print(a.shape == (11500, 20, 20, 3))
+# print(b.shape == (11500, 1))
+# print(c.shape == (1000, 20, 20, 3))
+# print(d.shape == (1000, 1))
+#
+# a, b, c, d = load_sets(defaults.PATH, defaults.PIC_SIZE, sample_size=(1000, 1000),
+#                        classes_to_read=('dogs', 'cats'))
+#
+# print(a.shape == (2000, 20, 20, 3))
+# print(b.shape == (2000, 2))
+# print(c.shape == (2000, 20, 20, 3))
+# print(d.shape == (2000, 2))
