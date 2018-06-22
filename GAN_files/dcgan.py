@@ -12,11 +12,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 import datetime
 import os
-import sys
+import math
+
+import defaults
+import INITIALIZATION.preparation as prep
 
 
 class DCGAN():
-    def __init__(self, pic_size, channels, num_classes):
+    def __init__(self, pic_size=defaults.PIC_SIZE, channels=defaults.CHANNELS, num_classes=defaults.NUM_CLASSES):
+        if (pic_size[0]%4)!=0 or (pic_size[1]%4)!=0:
+            raise ValueError('Picture size must be number possible to divide by 4!')
+
         self.img_rows = pic_size[0]
         self.img_cols = pic_size[0]
         self.channels = channels
@@ -32,7 +38,7 @@ class DCGAN():
             metrics=['accuracy'])
 
         # Build the generator
-        self.generator = self.build_generator()
+        self.generator = self.build_generator(pic_size)
 
         # The generator takes noise as input and generates imgs
         z = Input(shape=(100,))
@@ -49,12 +55,12 @@ class DCGAN():
         self.combined = Model(z, valid)
         self.combined.compile(loss='binary_crossentropy', optimizer=optimizer)
 
-    def build_generator(self):
+    def build_generator(self, pic_size=defaults.PIC_SIZE):
 
         model = Sequential()
 
-        model.add(Dense(128 * 7 * 7, activation="relu", input_dim=self.latent_dim))
-        model.add(Reshape((7, 7, 128)))
+        model.add(Dense(128 * int(pic_size[0]/4) * int(pic_size[1]/4), activation="relu", input_dim=self.latent_dim))
+        model.add(Reshape((int(pic_size[0]/4), int(pic_size[1]/4), 128)))
         model.add(UpSampling2D())
         model.add(Conv2D(128, kernel_size=3, padding="same"))
         model.add(BatchNormalization(momentum=0.8))
@@ -105,9 +111,9 @@ class DCGAN():
 
     def train(self, X_train, epochs, batch_size=128, save_interval=50):
         start_time = datetime.datetime.now()
-        folder_name = "DCGAN_" + start_time.strftime("%Y_%m_%d__%H_%M")
-        if not os.path.exists(f"images/{folder_name}"):
-            os.makedirs(f"images/{folder_name}")
+        folder_name = "DCGAN_"+start_time.strftime("%Y_%m_%d__%H_%M")+"/"
+        images_path = prep.create_folder([defaults.SAVED_FILES_PATH, "images", folder_name])
+        models_path = prep.create_folder([defaults.SAVED_FILES_PATH, "models", folder_name])
 
         X_train = X_train
 
@@ -147,9 +153,10 @@ class DCGAN():
 
             # If at save interval => save generated image samples
             if epoch % save_interval == 0:
-                self.save_imgs(epoch, folder_name=folder_name, computation_time=computation_time)
+                self.save_imgs(epoch, path=images_path)
+                self.save_model(path=models_path)
 
-    def save_imgs(self, epoch, folder_name, computation_time):
+    def save_imgs(self, epoch, path):
         r, c = 5, 5
         noise = np.random.normal(0, 1, (r * c, self.latent_dim))
         gen_imgs = self.generator.predict(noise)
@@ -164,8 +171,24 @@ class DCGAN():
                 axs[i,j].imshow(gen_imgs[cnt, :,:])
                 axs[i,j].axis('off')
                 cnt += 1
-        fig.savefig(f"images/{folder_name}/{epoch}.png")
+        fig.savefig(f"{path}/{epoch}.png")
         plt.close()
+
+
+    def save_model(self, path):
+
+        def save(model, path, model_name):
+
+            model_path = f"{path}/{model_name}.json"
+            weights_path = f"{path}/{model_name}_weights.hdf5"
+            options = {"file_arch": model_path,
+                        "file_weight": weights_path}
+            json_string = model.to_json()
+            open(options['file_arch'], 'w').write(json_string)
+            model.save_weights(options['file_weight'])
+
+        save(self.generator, path, "dcgan_generator")
+        save(self.discriminator, path, "dcgan_discriminator")
 
 
 if __name__ == '__main__':
