@@ -5,9 +5,10 @@ import GAN_files.aae as aae_gan
 import GAN_files.dcgan as dc_gan
 import GAN_data_load as dl
 import defaults
-import INITIALIZATION.preparation as prep
+import PROCES_FLOW.preparation as prep
 
 import numpy as np
+from keras.datasets import mnist
 
 # GAN model training variables
 EPOCHS = 1000001  # todo
@@ -18,8 +19,8 @@ prep.prepare_folder_structure()
 
 # Load dataset
 print("LOADING DATASET")
-#X_train, _, _, _ = dl.load_sets(sample_size=(100,100), classes_to_read=['dogs'])
-X_train, _, _, _ = dl.load_sets(classes_to_read=['dogs'])
+X_train, _, _, _ = dl.load_sets(sample_size=(20000,100), classes_to_read=['B'])
+#(X_train, _), (_, _) = mnist.load_data()
 print("DATASET LOADED")
 
 # Create neural network model

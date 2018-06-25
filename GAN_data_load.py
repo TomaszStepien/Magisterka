@@ -27,13 +27,21 @@ def load_images_into_array(path, pic_size=defaults.PIC_SIZE, sample_size=-1):
     elif sample_size > 0:
         shuffle(files)
         files = files[0:sample_size]
-    return np.stack([img_to_array(load_img(f"{path}//{file}", target_size=pic_size))/127.5 - 1. for file in files],
-                    axis=0)
+    temp_list = []
+    for file in files:
+        try:
+            img = img_to_array(load_img(f"{path}//{file}", target_size=pic_size))/127.5 - 1.
+            temp_list.append(img)
+        except:
+            print(f"problem with: {path}\\{file}")
+            pass
+        
+    return np.stack(temp_list,  axis=0)
 
 def load_sets(path=defaults.PATH,
               pic_size=defaults.PIC_SIZE,
               sample_size=(-1, -1),
-              classes_to_read=('cats', 'dogs')):
+              classes_to_read=defaults.CLASSES_TO_READ):
     """reads train and valid pictures into keras friendly arrays
     assumes that each class has a sepearate directory with a proper name
     eg.
@@ -58,19 +66,23 @@ def load_sets(path=defaults.PATH,
     y_valid = []
     label = 0
 
+
     for c in classes_to_read:
-        loaded = load_images_into_array(path=f"{path}train\\{c}", pic_size=pic_size, sample_size=sample_size[0])
+        #loaded = load_images_into_array(path=f"{path}train\\{c}", pic_size=pic_size, sample_size=sample_size[0])
+        [os.rename(f"{path}{c}\\{f}", f"{path}{c}\\"+f.replace('=', '')) for f in os.listdir(f"{path}{c}")]
+        loaded = load_images_into_array(path=f"{path}{c}", pic_size=pic_size, sample_size=sample_size[0])
         x_train.append(loaded)
         y_train += [label for i in range(loaded.shape[0])]
 
-        loaded = load_images_into_array(path=f"{path}valid\\{c}", pic_size=pic_size, sample_size=sample_size[1])
-        x_valid.append(loaded)
-        y_valid += [label for i in range(loaded.shape[0])]
+
+        #loaded = load_images_into_array(path=f"{path}valid\\{c}", pic_size=pic_size, sample_size=sample_size[1])
+        #x_valid.append(loaded)
+        #y_valid += [label for i in range(loaded.shape[0])]
 
         label += 1
 
     x_train, y_train = prepare_dataset(x=x_train, y=y_train, classes_to_read=classes_to_read)
-    x_valid, y_valid = prepare_dataset(x=x_valid, y=y_valid, classes_to_read=classes_to_read)
+    #x_valid, y_valid = prepare_dataset(x=x_valid, y=y_valid, classes_to_read=classes_to_read)
 
     return x_train, y_train, x_valid, y_valid
 
@@ -95,7 +107,7 @@ def prepare_dataset(x, y, classes_to_read):
 def load_all_pictures(path=defaults.PATH,
                       pic_size=defaults.PIC_SIZE,
                       sample_size=(-1, -1),
-                      classes_to_read=('cats', 'dogs')):
+                      classes_to_read=defaults.CLASSES_TO_READ):
     """
     loads all pictures from a given directory to one 4d ndarray
 

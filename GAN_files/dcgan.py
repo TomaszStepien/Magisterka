@@ -15,7 +15,7 @@ import os
 import math
 
 import defaults
-import INITIALIZATION.preparation as prep
+import PROCES_FLOW.preparation as prep
 
 
 class DCGAN():
@@ -59,8 +59,8 @@ class DCGAN():
 
         model = Sequential()
 
-        model.add(Dense(128 * int(pic_size[0]/4) * int(pic_size[1]/4), activation="relu", input_dim=self.latent_dim))
-        model.add(Reshape((int(pic_size[0]/4), int(pic_size[1]/4), 128)))
+        model.add(Dense(128 * 7 * 7, activation="relu", input_dim=self.latent_dim))
+        model.add(Reshape((7, 7, 128)))
         model.add(UpSampling2D())
         model.add(Conv2D(128, kernel_size=3, padding="same"))
         model.add(BatchNormalization(momentum=0.8))
@@ -115,7 +115,8 @@ class DCGAN():
         images_path = prep.create_folder([defaults.SAVED_FILES_PATH, "images", folder_name])
         models_path = prep.create_folder([defaults.SAVED_FILES_PATH, "models", folder_name])
 
-        X_train = X_train
+        #X_train = X_train / 127.5 - 1.
+        #X_train = np.expand_dims(X_train, axis=3)
 
         # Adversarial ground truths
         valid = np.ones((batch_size, 1))
@@ -165,11 +166,12 @@ class DCGAN():
         gen_imgs = 0.5 * gen_imgs + 0.5
 
         fig, axs = plt.subplots(r, c)
+        fig, axs = plt.subplots(r, c)
         cnt = 0
         for i in range(r):
             for j in range(c):
-                axs[i,j].imshow(gen_imgs[cnt, :,:])
-                axs[i,j].axis('off')
+                axs[i, j].imshow(gen_imgs[cnt, :, :, 0], cmap='gray')
+                axs[i, j].axis('off')
                 cnt += 1
         fig.savefig(f"{path}/{epoch}.png")
         plt.close()
