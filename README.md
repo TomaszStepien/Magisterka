@@ -1,3 +1,58 @@
+#29.07.2018
+WHAT WE HAVE
+1. FOLDER STRUCTURE
+2. LOADING DATA SETS
+3. DEFINING DCGAN
+4. TRAINING DCGAN
+5. MASTER THESIS VERSION 0.1
+
+
+WHAT WE NEED
+1. - 
+2. LOADING DATASET PIPELINE
+- function for dividing datasets for groups depending on parameters
+- changing number of classes (2-3-20)
+- changing dataset to mnist ?
+3. DEFINING CLASSIFICATORS
+- Keras convnet
+- 3 others ?
+4. PIPELINE
+- statistics (GAN + class + final? )
+- charts (GAN + class + final? )
+5. MASTER THESIS FINAL VERSION
+	0. Wprowadzenie?
+	1. Metody balansowania próby (d)
+		- Tomek
+	2. GAN (d)
+		- Karolina
+	3. Klasyfikatory (d)
+		- Tomek
+	4. Opowieść o danych i opowieść o programie (m)
+		- ?
+	5. Przedstawienie wyników (d)
+		- Tomek
+	6. Dyskusja (d)
+		- Karolina
+	7. Bibliografia
+	
+
+STREAM 1
+- Działamy na dwóch klasach
+1. Napisać do Ramszy o pracę o augumentacji - Karolina
+2. Dataset - ładowanie danych?? - Tomek
+3. Klasyfikator - Tomek
+4. Statystyki - Karolina
+	- GAN + wykresy
+
+DAILY (max. 10 minut) o 20:30
+1. Co zrobiłeś
+2. Co Ci przeszkadza
+3. Co będziesz robić
+
+-------------
+
+
+
 # Magisterka
 najlepsza magisterka ever
 
