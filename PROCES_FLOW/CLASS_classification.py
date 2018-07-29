@@ -1,22 +1,14 @@
-from keras.models import Sequential
-from keras.layers import Activation, Dropout, Flatten, Dense, Conv2D, MaxPooling2D
-from keras.callbacks import EarlyStopping, TensorBoard
-from keras.preprocessing.image import ImageDataGenerator
-from keras.models import Sequential
-from keras.layers import Dropout, Flatten, Dense
-from keras import applications
-
-from sklearn.metrics import accuracy_score, f1_score
-from datetime import datetime
+from importlib import reload
 
 import numpy as np
-from importlib import reload
+from keras.layers import Activation, Conv2D, MaxPooling2D
+from keras.layers import Flatten, Dense
+from keras.models import Sequential
+from keras.preprocessing.image import ImageDataGenerator
 
 import defaults
 
 reload(defaults)
-import PROCES_FLOW.preparation as prep
-import GAN_data_load as dl
 
 
 def cnn(size, n_layers):
@@ -106,33 +98,34 @@ model.fit_generator(
     validation_data=generator_valid,
     validation_steps=800 // batch_size)
 
-
 # TEST MODEL
 import os
+
 test_labels = []
 for x in range(len(os.listdir(f"{defaults.CLASS_DATA_PATH}test"))):
     test_labels += [x] * len(os.listdir(f"{defaults.CLASS_DATA_PATH}test/" +
                                         os.listdir(f"{defaults.CLASS_DATA_PATH}test")[x]))
 
 batch_size = 50
-datagen = ImageDataGenerator(rescale=1./255)
+datagen = ImageDataGenerator(rescale=1. / 255)
 generator = datagen.flow_from_directory(f"{defaults.CLASS_DATA_PATH}test/",
-                                        batch_size = batch_size,
-                                        target_size =defaults.PIC_SIZE,
-                                        classes = None, shuffle =False)
+                                        batch_size=batch_size,
+                                        target_size=defaults.PIC_SIZE,
+                                        classes=None, shuffle=False)
 
 st_per_e_test = 1
 test_data_features = model.predict_generator(generator,
                                              steps=st_per_e_test,
-                                             use_multiprocessing=False, verbose = 1)
+                                             use_multiprocessing=False, verbose=1)
 
-from IPython.display import Image, display, clear_output
-k=0
+from IPython.display import Image, display
+
+k = 0
 
 for x in range(len(test_data_features)):
     print(generator.filenames[x])
-    k+=1
-    print(round(test_data_features[x][0],2))
+    k += 1
+    print(round(test_data_features[x][0], 2))
     img_path = str(f"{defaults.CLASS_DATA_PATH}test/{generator.filenames[x]}")
     img = Image(img_path)
     display(img)

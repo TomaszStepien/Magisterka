@@ -1,26 +1,23 @@
 from __future__ import print_function, division
 
-from keras.datasets import mnist
-from keras.layers import Input, Dense, Reshape, Flatten, Dropout
+import datetime
+
+import matplotlib.pyplot as plt
+import numpy as np
 from keras.layers import BatchNormalization, Activation, ZeroPadding2D
+from keras.layers import Input, Dense, Reshape, Flatten, Dropout
 from keras.layers.advanced_activations import LeakyReLU
 from keras.layers.convolutional import UpSampling2D, Conv2D
 from keras.models import Sequential, Model
 from keras.optimizers import Adam
 
-import matplotlib.pyplot as plt
-import numpy as np
-import datetime
-import os
-import math
-
-import defaults
 import PROCES_FLOW.preparation as prep
+import defaults
 
 
 class DCGAN():
     def __init__(self, pic_size=defaults.PIC_SIZE, channels=defaults.CHANNELS, num_classes=defaults.NUM_CLASSES):
-        if (pic_size[0]%4)!=0 or (pic_size[1]%4)!=0:
+        if (pic_size[0] % 4) != 0 or (pic_size[1] % 4) != 0:
             raise ValueError('Picture size must be number possible to divide by 4!')
 
         self.img_rows = pic_size[0]
@@ -34,8 +31,8 @@ class DCGAN():
         # Build and compile the discriminator
         self.discriminator = self.build_discriminator()
         self.discriminator.compile(loss='binary_crossentropy',
-            optimizer=optimizer,
-            metrics=['accuracy'])
+                                   optimizer=optimizer,
+                                   metrics=['accuracy'])
 
         # Build the generator
         self.generator = self.build_generator(pic_size)
@@ -87,7 +84,7 @@ class DCGAN():
         model.add(LeakyReLU(alpha=0.2))
         model.add(Dropout(0.25))
         model.add(Conv2D(64, kernel_size=3, strides=2, padding="same"))
-        model.add(ZeroPadding2D(padding=((0,1),(0,1))))
+        model.add(ZeroPadding2D(padding=((0, 1), (0, 1))))
         model.add(BatchNormalization(momentum=0.8))
         model.add(LeakyReLU(alpha=0.2))
         model.add(Dropout(0.25))
@@ -111,12 +108,12 @@ class DCGAN():
 
     def train(self, X_train, epochs, batch_size=128, save_interval=50):
         start_time = datetime.datetime.now()
-        folder_name = "DCGAN_"+start_time.strftime("%Y_%m_%d__%H_%M")+"/"
+        folder_name = "DCGAN_" + start_time.strftime("%Y_%m_%d__%H_%M") + "/"
         images_path = prep.create_folder([defaults.SAVED_FILES_PATH, "images", folder_name])
         models_path = prep.create_folder([defaults.SAVED_FILES_PATH, "models", folder_name])
 
-        #X_train = X_train / 127.5 - 1.
-        #X_train = np.expand_dims(X_train, axis=3)
+        # X_train = X_train / 127.5 - 1.
+        # X_train = np.expand_dims(X_train, axis=3)
 
         # Adversarial ground truths
         valid = np.ones((batch_size, 1))
@@ -150,7 +147,8 @@ class DCGAN():
 
             # Plot the progress
             computation_time = str(datetime.datetime.now() - start_time)
-            print("%d [D loss: %f, acc.: %.2f%%] [G loss: %f] exec.time: %s" % (epoch, d_loss[0], 100*d_loss[1], g_loss, computation_time))
+            print("%d [D loss: %f, acc.: %.2f%%] [G loss: %f] exec.time: %s" % (
+                epoch, d_loss[0], 100 * d_loss[1], g_loss, computation_time))
 
             # If at save interval => save generated image samples
             if epoch % save_interval == 0:
@@ -176,15 +174,13 @@ class DCGAN():
         fig.savefig(f"{path}/{epoch}.png")
         plt.close()
 
-
     def save_model(self, path):
 
         def save(model, path, model_name):
-
             model_path = f"{path}/{model_name}.json"
             weights_path = f"{path}/{model_name}_weights.hdf5"
             options = {"file_arch": model_path,
-                        "file_weight": weights_path}
+                       "file_weight": weights_path}
             json_string = model.to_json()
             open(options['file_arch'], 'w').write(json_string)
             model.save_weights(options['file_weight'])

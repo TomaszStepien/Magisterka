@@ -2,6 +2,7 @@ import os
 
 import defaults
 
+
 def create_folder(folder_structure):
     """divides datasets for x and y
 
@@ -17,7 +18,7 @@ def create_folder(folder_structure):
             pass
     return folder_struct
 
+
 def prepare_folder_structure():
     create_folder([defaults.SAVED_FILES_PATH, "images"])
     create_folder([defaults.SAVED_FILES_PATH, "models"])
-
