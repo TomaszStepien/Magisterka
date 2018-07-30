@@ -1,6 +1,8 @@
+import os
 from importlib import reload
 
 import numpy as np
+from IPython.display import Image, display
 from keras.layers import Activation, Conv2D, MaxPooling2D
 from keras.layers import Flatten, Dense
 from keras.models import Sequential
@@ -99,8 +101,6 @@ model.fit_generator(
     validation_steps=800 // batch_size)
 
 # TEST MODEL
-import os
-
 test_labels = []
 for x in range(len(os.listdir(f"{defaults.CLASS_DATA_PATH}test"))):
     test_labels += [x] * len(os.listdir(f"{defaults.CLASS_DATA_PATH}test/" +
@@ -117,8 +117,6 @@ st_per_e_test = 1
 test_data_features = model.predict_generator(generator,
                                              steps=st_per_e_test,
                                              use_multiprocessing=False, verbose=1)
-
-from IPython.display import Image, display
 
 k = 0
 

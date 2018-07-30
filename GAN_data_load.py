@@ -71,7 +71,7 @@ def load_sets(path=defaults.PATH,
         [os.rename(f"{path}{c}\\{f}", f"{path}{c}\\" + f.replace('=', '')) for f in os.listdir(f"{path}{c}")]
         loaded = load_images_into_array(path=f"{path}{c}", pic_size=pic_size, sample_size=sample_size[0])
         x_train.append(loaded)
-        y_train += [label for i in range(loaded.shape[0])]
+        y_train += [label] * loaded.shape[0]
 
         # loaded = load_images_into_array(path=f"{path}valid\\{c}", pic_size=pic_size, sample_size=sample_size[1])
         # x_valid.append(loaded)

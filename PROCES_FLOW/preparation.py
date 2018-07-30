@@ -15,6 +15,7 @@ def create_folder(folder_structure):
         try:
             os.makedirs(folder_struct)
         except:
+            print('error')
             pass
     return folder_struct
 
