@@ -12,11 +12,11 @@ from keras.models import Sequential, Model
 from keras.optimizers import Adam
 
 import PROCES_FLOW.preparation as prep
-import defaults
+import config
 
 
 class DCGAN():
-    def __init__(self, pic_size=defaults.PIC_SIZE, channels=defaults.CHANNELS, num_classes=defaults.NUM_CLASSES):
+    def __init__(self, pic_size=config.PIC_SIZE, channels=config.CHANNELS, num_classes=config.NUM_CLASSES):
         if (pic_size[0] % 4) != 0 or (pic_size[1] % 4) != 0:
             raise ValueError('Picture size must be number possible to divide by 4!')
 
@@ -52,7 +52,7 @@ class DCGAN():
         self.combined = Model(z, valid)
         self.combined.compile(loss='binary_crossentropy', optimizer=optimizer)
 
-    def build_generator(self, pic_size=defaults.PIC_SIZE):
+    def build_generator(self, pic_size=config.PIC_SIZE):
 
         model = Sequential()
 
@@ -109,8 +109,8 @@ class DCGAN():
     def train(self, X_train, epochs, batch_size=128, save_interval=50):
         start_time = datetime.datetime.now()
         folder_name = "DCGAN_" + start_time.strftime("%Y_%m_%d__%H_%M") + "/"
-        images_path = prep.create_folder([defaults.SAVED_FILES_PATH, "images", folder_name])
-        models_path = prep.create_folder([defaults.SAVED_FILES_PATH, "models", folder_name])
+        images_path = prep.create_folder([config.SAVED_FILES_PATH, "images", folder_name])
+        models_path = prep.create_folder([config.SAVED_FILES_PATH, "models", folder_name])
 
         # X_train = X_train / 127.5 - 1.
         # X_train = np.expand_dims(X_train, axis=3)

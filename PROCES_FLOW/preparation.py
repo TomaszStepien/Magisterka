@@ -1,6 +1,6 @@
 import os
 
-import defaults
+import config
 
 
 def create_folder(folder_structure):
@@ -21,5 +21,5 @@ def create_folder(folder_structure):
 
 
 def prepare_folder_structure():
-    create_folder([defaults.SAVED_FILES_PATH, "images"])
-    create_folder([defaults.SAVED_FILES_PATH, "models"])
+    create_folder([config.SAVED_FILES_PATH, "images"])
+    create_folder([config.SAVED_FILES_PATH, "models"])

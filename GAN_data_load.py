@@ -10,10 +10,10 @@ import numpy as np
 from keras.preprocessing.image import img_to_array, load_img
 from keras.utils import to_categorical
 
-import defaults
+import config
 
 
-def load_images_into_array(path, pic_size=defaults.PIC_SIZE, sample_size=-1):
+def load_images_into_array(path, pic_size=config.PIC_SIZE, sample_size=-1):
     """iterates over a directory and reads all images
     into an ndarray with dimensions (nfiles, width, height, 3)
     assumes all files in the given directory are images
@@ -38,10 +38,10 @@ def load_images_into_array(path, pic_size=defaults.PIC_SIZE, sample_size=-1):
     return np.stack(temp_list, axis=0)
 
 
-def load_sets(path=defaults.PATH,
-              pic_size=defaults.PIC_SIZE,
+def load_sets(path=config.PATH,
+              pic_size=config.PIC_SIZE,
               sample_size=(-1, -1),
-              classes_to_read=defaults.CLASSES_TO_READ):
+              classes_to_read=config.CLASSES_TO_READ):
     """reads train and valid pictures into keras friendly arrays
     assumes that each class has a sepearate directory with a proper name
     eg.
@@ -104,10 +104,10 @@ def prepare_dataset(x, y, classes_to_read):
     return x_dataset, y_dataset
 
 
-def load_all_pictures(path=defaults.PATH,
-                      pic_size=defaults.PIC_SIZE,
+def load_all_pictures(path=config.PATH,
+                      pic_size=config.PIC_SIZE,
                       sample_size=(-1, -1),
-                      classes_to_read=defaults.CLASSES_TO_READ):
+                      classes_to_read=config.CLASSES_TO_READ):
     """
     loads all pictures from a given directory to one 4d ndarray
 
