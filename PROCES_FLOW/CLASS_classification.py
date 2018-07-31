@@ -1,22 +1,16 @@
-from keras.models import Sequential
-from keras.layers import Activation, Dropout, Flatten, Dense, Conv2D, MaxPooling2D
-from keras.callbacks import EarlyStopping, TensorBoard
-from keras.preprocessing.image import ImageDataGenerator
-from keras.models import Sequential
-from keras.layers import Dropout, Flatten, Dense
-from keras import applications
-
-from sklearn.metrics import accuracy_score, f1_score
-from datetime import datetime
-
-import numpy as np
+import os
 from importlib import reload
 
-import defaults
+import numpy as np
+from IPython.display import Image, display
+from keras.layers import Activation, Conv2D, MaxPooling2D
+from keras.layers import Flatten, Dense
+from keras.models import Sequential
+from keras.preprocessing.image import ImageDataGenerator
 
-reload(defaults)
-import PROCES_FLOW.preparation as prep
-import GAN_data_load as dl
+import config
+
+reload(config)
 
 
 def cnn(size, n_layers):
@@ -27,9 +21,9 @@ def cnn(size, n_layers):
     # model    - compiled CNN
 
     # Define model hyperparamters
-    MIN_NEURONS = defaults.MIN_NEURONS
-    MAX_NEURONS = defaults.MAX_NEURONS
-    KERNEL = defaults.KERNEL
+    MIN_NEURONS = config.MIN_NEURONS
+    MAX_NEURONS = config.MAX_NEURONS
+    KERNEL = config.KERNEL
 
     # Determine the # of neurons in each convolutional layer
     steps = np.floor(MAX_NEURONS / (n_layers + 1))
@@ -71,7 +65,7 @@ def cnn(size, n_layers):
 
 
 # Instantiate the model
-model = cnn(size=(28, 28, 3), n_layers=defaults.N_LAYERS)
+model = cnn(size=(28, 28, 3), n_layers=config.N_LAYERS)
 
 # TRAIN DATA
 datagen = ImageDataGenerator(rescale=1. / 255, horizontal_flip=True,
@@ -79,8 +73,8 @@ datagen = ImageDataGenerator(rescale=1. / 255, horizontal_flip=True,
 batch_size = 10
 model_type = "binary"
 generator_train = datagen.flow_from_directory(
-    f"{defaults.CLASS_DATA_PATH}train",
-    target_size=defaults.PIC_SIZE,
+    f"{config.CLASS_DATA_PATH}train",
+    target_size=config.PIC_SIZE,
     batch_size=batch_size,
     class_mode=model_type,
     shuffle=False)
@@ -90,8 +84,8 @@ print(generator_train.class_indices)
 # VALID DATA
 datagen = ImageDataGenerator(rescale=1. / 255)
 generator_valid = datagen.flow_from_directory(
-    f"{defaults.CLASS_DATA_PATH}valid",
-    target_size=defaults.PIC_SIZE,
+    f"{config.CLASS_DATA_PATH}valid",
+    target_size=config.PIC_SIZE,
     batch_size=batch_size,
     class_mode=model_type,
     shuffle=False)
@@ -106,33 +100,30 @@ model.fit_generator(
     validation_data=generator_valid,
     validation_steps=800 // batch_size)
 
-
 # TEST MODEL
-import os
 test_labels = []
-for x in range(len(os.listdir(f"{defaults.CLASS_DATA_PATH}test"))):
-    test_labels += [x] * len(os.listdir(f"{defaults.CLASS_DATA_PATH}test/" +
-                                        os.listdir(f"{defaults.CLASS_DATA_PATH}test")[x]))
+for x in range(len(os.listdir(f"{config.CLASS_DATA_PATH}test"))):
+    test_labels += [x] * len(os.listdir(f"{config.CLASS_DATA_PATH}test/" +
+                                        os.listdir(f"{config.CLASS_DATA_PATH}test")[x]))
 
 batch_size = 50
-datagen = ImageDataGenerator(rescale=1./255)
-generator = datagen.flow_from_directory(f"{defaults.CLASS_DATA_PATH}test/",
-                                        batch_size = batch_size,
-                                        target_size =defaults.PIC_SIZE,
-                                        classes = None, shuffle =False)
+datagen = ImageDataGenerator(rescale=1. / 255)
+generator = datagen.flow_from_directory(f"{config.CLASS_DATA_PATH}test/",
+                                        batch_size=batch_size,
+                                        target_size=config.PIC_SIZE,
+                                        classes=None, shuffle=False)
 
 st_per_e_test = 1
 test_data_features = model.predict_generator(generator,
                                              steps=st_per_e_test,
-                                             use_multiprocessing=False, verbose = 1)
+                                             use_multiprocessing=False, verbose=1)
 
-from IPython.display import Image, display, clear_output
-k=0
+k = 0
 
 for x in range(len(test_data_features)):
     print(generator.filenames[x])
-    k+=1
-    print(round(test_data_features[x][0],2))
-    img_path = str(f"{defaults.CLASS_DATA_PATH}test/{generator.filenames[x]}")
+    k += 1
+    print(round(test_data_features[x][0], 2))
+    img_path = str(f"{config.CLASS_DATA_PATH}test/{generator.filenames[x]}")
     img = Image(img_path)
     display(img)

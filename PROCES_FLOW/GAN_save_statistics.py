@@ -1,3 +1,3 @@
-#Inception Score
+# Inception Score
 
-#Fréchet Inception Distance
+# Fréchet Inception Distance
