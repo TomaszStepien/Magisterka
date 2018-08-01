@@ -1,11 +1,10 @@
-import GAN_data_load as dl
-import GAN_files.dcgan as dc_gan
-import GAN_files.aae as aae_gan
-import PROCES_FLOW.preparation as prep
 import config
+import gans.aae as aae_gan
+import gans.dcgan as dc_gan
+import load_data as dl
+import preparation as prep
 
-
-def main():
+if __name__ == "__main__":
     if config.FLAG_PREPARE_FOLDER_STRUCTURE:
         prep.prepare_folder_structure()
 
@@ -24,7 +23,3 @@ def main():
                                              num_classes=config.NUM_CLASSES)
         aae.train(X_train=X_train, epochs=config.EPOCHS, batch_size=config.BATCH_SIZE, \
                   sample_interval=config.SAMPLE_INTERVAL)
-
-
-if __name__ == "__main__":
-    main()

@@ -1,16 +1,22 @@
 """contains default values for parameters used in many files"""
 import os
+import sys
 
 """ GAN model training variables """
 EPOCHS = 1000001  # todo
 BATCH_SIZE = 100
 SAMPLE_INTERVAL = 1000
 
-#Dataset
-#DATASET = "C:\\magisterka_data\\dogscats\\"
-DATASET = "C:\\magisterka_data\\notMNIST_large\\" # https://www.kaggle.com/volperosso/simple-cnn-classifier-on-notmnist/data
+# Dataset
 
-SAVED_FILES = 'SAVED_FILES'
+# DATASET = "C:\\magisterka_data\\dogscats\\"
+
+if sys.platform.startswith('linux'):
+    DATASET = "/home/tomasz/magisterka_data/notMNIST_large/"  # https://www.kaggle.com/volperosso/simple-cnn-classifier-on-notmnist/data
+else:
+    DATASET = "C:\\magisterka_data\\notMNIST_large\\"
+
+SAVED_FILES = 'saved_files'
 IMAGES = 'images'
 MODELS = 'models'
 

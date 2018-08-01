@@ -11,8 +11,8 @@ from keras.layers.convolutional import UpSampling2D, Conv2D
 from keras.models import Sequential, Model
 from keras.optimizers import Adam
 
-import PROCES_FLOW.preparation as prep
 import config
+import preparation as prep
 
 
 class DCGAN():
