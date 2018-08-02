@@ -4,6 +4,7 @@ import datetime
 
 import matplotlib.pyplot as plt
 import numpy as np
+import csv
 from keras.layers import BatchNormalization, Activation, ZeroPadding2D
 from keras.layers import Input, Dense, Reshape, Flatten, Dropout
 from keras.layers.advanced_activations import LeakyReLU
@@ -149,6 +150,9 @@ class DCGAN():
             computation_time = str(datetime.datetime.now() - start_time)
             print("%d [D loss: %f, acc.: %.2f%%] [G loss: %f] exec.time: %s" % (
                 epoch, d_loss[0], 100 * d_loss[1], g_loss, computation_time))
+            with open('stats_file.csv', 'a', newline='') as outfile: #TODO: Add proper path
+                writer = csv.writer(outfile)
+                writer.writerow([epoch, d_loss[0], 100 * d_loss[1], g_loss, computation_time])
 
             # If at save interval => save generated image samples
             if epoch % save_interval == 0:
