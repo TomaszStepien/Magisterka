@@ -186,7 +186,7 @@ class DCGAN():
             options = {"file_arch": model_path,
                        "file_weight": weights_path}
             json_string = model.to_json()
-            open(options['file_arch'], 'w').write(json_string)
+            open(options['file_arch' ], 'w').write(json_string)
             model.save_weights(options['file_weight'])
 
         save(self.generator, path, "dcgan_generator")
