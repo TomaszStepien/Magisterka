@@ -3,6 +3,7 @@
 todo: try https://keras.io/preprocessing/image/
 """
 
+import operator
 import os
 import random
 import shutil
@@ -142,14 +143,25 @@ def prepare_final_datasets():
     Remove old directories, create new one.
     Randomly choose pictures from large dataset and copy them to created folders
     """
-    _remove_trash(config.LETTERS_PATH)
+    _remove_trash(config.FINAL_DATA_PATH)
+
     _prepare_folder(config.FINAL_DATA_PATH)
-    _prepare_folder(config.LETTERS_PATH)
+    _prepare_folder(os.path.join(config.FINAL_DATA_PATH, 'first_assumption'))
+    _prepare_folder(config.GAN_LETTERS_PATH)
+    _prepare_folder(config.CLASS_LETTERS_PATH)
+    _prepare_folder(os.path.join(config.CLASS_LETTERS_PATH, '1000_1000'))
+    _prepare_folder(os.path.join(config.CLASS_LETTERS_PATH, '1000_1000', 'train'))
+    _prepare_folder(os.path.join(config.CLASS_LETTERS_PATH, '1000_1000', 'validation'))
 
     for letter in config.LETTERS:
-        _prepare_folder(os.path.join(config.LETTERS_PATH, letter + '_1000'))
-        _prepare_folder(os.path.join(config.LETTERS_PATH, letter + '_500'))
-        _prepare_folder(os.path.join(config.LETTERS_PATH, letter + '_100'))
+        # GAN FILES
+        _prepare_folder(os.path.join(config.GAN_LETTERS_PATH, letter + '_1000'))
+        _prepare_folder(os.path.join(config.GAN_LETTERS_PATH, letter + '_500'))
+        _prepare_folder(os.path.join(config.GAN_LETTERS_PATH, letter + '_100'))
+
+        # CLASS FILES
+        _prepare_folder(os.path.join(config.CLASS_LETTERS_PATH, '1000_1000', 'train', letter))
+        _prepare_folder(os.path.join(config.CLASS_LETTERS_PATH, '1000_1000', 'validation', letter))
 
     for letter in config.LETTERS:
         letters_all = [f for f in listdir(os.path.join(config.DATA_PATH, letter)) if
@@ -158,21 +170,38 @@ def prepare_final_datasets():
         letters_500 = random.sample(letters_1000, 500)
         letters_100 = random.sample(letters_500, 50)
 
+        # COPY FILES TO GAN
         _copy_files(os.path.join(config.DATA_PATH, letter, ''),
-                    os.path.join(config.LETTERS_PATH, letter + '_1000', ''),
+                    os.path.join(config.GAN_LETTERS_PATH, letter + '_1000', ''),
                     letters_1000, letter)
         _copy_files(os.path.join(config.DATA_PATH, letter, ''),
-                    os.path.join(config.LETTERS_PATH, letter + '_500', ''),
+                    os.path.join(config.GAN_LETTERS_PATH, letter + '_500', ''),
                     letters_500, letter)
         _copy_files(os.path.join(config.DATA_PATH, letter, ''),
-                    os.path.join(config.LETTERS_PATH, letter + '_100', ''),
+                    os.path.join(config.GAN_LETTERS_PATH, letter + '_100', ''),
                     letters_100, letter)
+
+        # COPY FILES TO CLASS
+        _train_validation_dividing(letters_1000, letter, 0.7)
+
+
+def _train_validation_dividing(files, letter, percentage):
+    sample = random.sample(files, int(len(files)*percentage))
+    train = [x for x in files if x in sample]
+    valid = [x for x in files if x not in sample]
+
+    _copy_files(os.path.join(config.GAN_LETTERS_PATH, letter + '_1000', ''),
+                os.path.join(config.CLASS_LETTERS_PATH, '1000_1000', 'train', letter, ''),
+                train, letter)
+    _copy_files(os.path.join(config.GAN_LETTERS_PATH, letter + '_1000', ''),
+                os.path.join(config.CLASS_LETTERS_PATH, '1000_1000', 'validation', letter, ''),
+                valid, letter)
 
 
 def _copy_files(source_folder, destination_folder, files, letter):
     for image in files:
         shutil.copyfile(source_folder + image, destination_folder + image)
-    print(f"{len(files)} letters for {letter} copied")
+    print(f"{str(len(files))} letters for {letter} copied")
 
 
 def _remove_trash(path):

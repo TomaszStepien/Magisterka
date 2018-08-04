@@ -21,8 +21,9 @@ SAVED_MODELS = home + 'saved_files/saved_models/'
 CLASS_DATA_PATH = home + 'notMNIST_training/'
 STATS_FILES = home + 'saved_files/stats_files/'
 IMAGE_PATH = os.path.join(home, 'notMNIST_large')
-FINAL_DATA_PATH = LETTERS_PATH = os.path.join(home, 'MASTER_DATA')
-LETTERS_PATH = os.path.join(FINAL_DATA_PATH, 'first_assumption')
+FINAL_DATA_PATH = GAN_LETTERS_PATH = os.path.join(home, 'MASTER_DATA')
+GAN_LETTERS_PATH = os.path.join(FINAL_DATA_PATH, 'first_assumption', 'GAN')
+CLASS_LETTERS_PATH = os.path.join(FINAL_DATA_PATH, 'first_assumption', 'CLASS')
 
 LETTERS = ['A', 'D']
 
