@@ -37,7 +37,9 @@ for f in (SAVED_FILES, SAVED_IMAGES, SAVED_MODELS, CLASS_DATA_PATH, STATS_FILES)
     create_subfolder(f)
 
 # setup flags
+FLAG_PREPARE_DATASETS = False
 FLAG_TRAIN_GAN = False
+FLAG_CLASSIFY = True
 
 # dataset fixed values
 PIC_SIZE = (28, 28)  # only odd numbers

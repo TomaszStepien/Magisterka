@@ -138,6 +138,10 @@ def augment_sets(x_train, y_train, x_valid, y_valid):
 
 
 def prepare_final_datasets():
+    """
+    Remove old directories, create new one.
+    Randomly choose pictures from large dataset and copy them to created folders
+    """
     _remove_trash(config.LETTERS_PATH)
     _prepare_folder(config.FINAL_DATA_PATH)
     _prepare_folder(config.LETTERS_PATH)
@@ -152,7 +156,7 @@ def prepare_final_datasets():
                        isfile(join(os.path.join(config.DATA_PATH, letter), f))]
         letters_1000 = random.sample(letters_all, 1000)
         letters_500 = random.sample(letters_1000, 500)
-        letters_100 = random.sample(letters_500, 100)
+        letters_100 = random.sample(letters_500, 50)
 
         _copy_files(os.path.join(config.DATA_PATH, letter, ''),
                     os.path.join(config.LETTERS_PATH, letter + '_1000', ''),
