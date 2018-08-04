@@ -38,7 +38,7 @@ def load_images_into_array(path, pic_size=config.PIC_SIZE, sample_size=-1):
     return np.stack(temp_list, axis=0)
 
 
-def load_sets(path=config.PATH,
+def load_sets(path=config.DATA_PATH,
               pic_size=config.PIC_SIZE,
               sample_size=(-1, -1),
               classes_to_read=config.CLASSES_TO_READ):
@@ -104,7 +104,7 @@ def prepare_dataset(x, y, classes_to_read):
     return x_dataset, y_dataset
 
 
-def load_all_pictures(path=config.PATH,
+def load_all_pictures(path=config.DATA_PATH,
                       pic_size=config.PIC_SIZE,
                       sample_size=(-1, -1),
                       classes_to_read=config.CLASSES_TO_READ):
