@@ -4,6 +4,10 @@ todo: try https://keras.io/preprocessing/image/
 """
 
 import os
+import random
+import shutil
+from os import listdir
+from os.path import isfile, join
 from random import shuffle
 
 import numpy as np
@@ -131,6 +135,63 @@ def augment_sets(x_train, y_train, x_valid, y_valid):
     """work in progress"""
     # todo: implement https://keras.io/preprocessing/image/
     return x_train, y_train, x_valid, y_valid
+
+
+def prepare_final_datasets():
+    _remove_trash(config.LETTERS_PATH)
+    _prepare_folder(config.FINAL_DATA_PATH)
+    _prepare_folder(config.LETTERS_PATH)
+
+    for letter in config.LETTERS:
+        _prepare_folder(os.path.join(config.LETTERS_PATH, letter + '_1000'))
+        _prepare_folder(os.path.join(config.LETTERS_PATH, letter + '_500'))
+        _prepare_folder(os.path.join(config.LETTERS_PATH, letter + '_100'))
+
+    for letter in config.LETTERS:
+        letters_all = [f for f in listdir(os.path.join(config.DATA_PATH, letter)) if
+                       isfile(join(os.path.join(config.DATA_PATH, letter), f))]
+        letters_1000 = random.sample(letters_all, 1000)
+        letters_500 = random.sample(letters_1000, 500)
+        letters_100 = random.sample(letters_500, 100)
+
+        _copy_files(os.path.join(config.DATA_PATH, letter, ''),
+                    os.path.join(config.LETTERS_PATH, letter + '_1000', ''),
+                    letters_1000, letter)
+        _copy_files(os.path.join(config.DATA_PATH, letter, ''),
+                    os.path.join(config.LETTERS_PATH, letter + '_500', ''),
+                    letters_500, letter)
+        _copy_files(os.path.join(config.DATA_PATH, letter, ''),
+                    os.path.join(config.LETTERS_PATH, letter + '_100', ''),
+                    letters_100, letter)
+
+
+def _copy_files(source_folder, destination_folder, files, letter):
+    for image in files:
+        shutil.copyfile(source_folder + image, destination_folder + image)
+    print(f"{len(files)} letters for {letter} copied")
+
+
+def _remove_trash(path):
+    """
+    Remove directory with files
+    :param path: path to the directory
+    """
+    try:
+        shutil.rmtree(path)
+        print(f"{path} folder deleted")
+    except:
+        print(f"Nothing to delete ({path})")
+
+
+def _prepare_folder(path):
+    """
+    Make directory
+    :param path: path to the directory
+    """
+    try:
+        os.mkdir(path)
+    except:
+        print(f"{path} directory already exists")
 
 # test cases ====================================================================================
 # a, b, c, d = load_sets(defaults.PATH, defaults.PIC_SIZE, sample_size=(-1, -1),

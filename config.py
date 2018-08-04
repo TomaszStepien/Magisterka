@@ -13,12 +13,18 @@ else:
     home = "C:/magisterka_data/"
 
 DATA_PATH = home + "notMNIST_small"
+DATA_PATH = home + 'notMNIST_large'
 
 SAVED_FILES = home + 'saved_files/'
 SAVED_IMAGES = home + 'saved_files/saved_images/'
 SAVED_MODELS = home + 'saved_files/saved_models/'
 CLASS_DATA_PATH = home + 'notMNIST_training/'
 STATS_FILES = home + 'saved_files/stats_files/'
+IMAGE_PATH = os.path.join(home, 'notMNIST_large')
+FINAL_DATA_PATH = LETTERS_PATH = os.path.join(home, 'MASTER_DATA')
+LETTERS_PATH = os.path.join(FINAL_DATA_PATH, 'first_assumption')
+
+LETTERS = ['A', 'D']
 
 
 def create_subfolder(directory):
@@ -31,9 +37,7 @@ for f in (SAVED_FILES, SAVED_IMAGES, SAVED_MODELS, CLASS_DATA_PATH, STATS_FILES)
     create_subfolder(f)
 
 # setup flags
-FLAG_TRAIN_GAN = True
-FLAG_GAN_AAE = False
-FLAG_GAN_DCGAN = True
+FLAG_TRAIN_GAN = False
 
 # dataset fixed values
 PIC_SIZE = (28, 28)  # only odd numbers
