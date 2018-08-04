@@ -1,3 +1,24 @@
+# 04.08.2018
+Kilka podejść do sprawdzenia w workflow:
+1. Jak klasyfikatory zachowują się przy zupełnie różnych od siebie literkach (A oraz D)
+2. Jak klasyfikatory zachowują się przy podobnych do siebie literkach (G oraz C)
+3. Jak klasyfikatory zachowują się przy bardzo podobnych do siebie literkach (I oraz J)
+
+W każdym z tych przypadków:
+1. Sprawdzić klasyfikator przy zbilansowanym zbiorze
+	- 1000 obserwacji na jedną literkę, 1000 obserwacji na drugą literkę
+	
+2. Sprawdzić klasyfikator przy niezbilansowanym zbiorze (najpierw na jedną literkę, później na drugą literkę)
+	- 1000 obserwacji na jedną literkę, 500 obserwacji na drugą literkę
+2.1. Sprawdzić klasyfikator przy niezbilansowanym zbiorze (najpierw na jedną literkę, później na drugą literkę), ale trenować go zdecydowanie dłużej
+2.2. Sprawdzić klasyfikator przy zbiorze zbilansowanym przez GANy (najpierw na jedną literkę, a później na drugą literkę)
+
+3. Sprawdzić klasyfikator przy niezbilansowanym zbiorze (najpierw na jedną literkę, później na drugą literkę)
+	- 1000 obserwacji na jedną literkę, 100/200 obserwacji na drugą literkę
+3.1. Sprawdzić klasyfikator przy niezbilansowanym zbiorze (najpierw na jedną literkę, później na drugą literkę), ale trenować go zdecydowanie dłużej
+3.2. Sprawdzić klasyfikator przy zbiorze zbilansowanym przez GANy (najpierw na jedną literkę, a później na drugą literkę)
+
+
 #29.07.2018
 WHAT WE HAVE
 1. FOLDER STRUCTURE
@@ -29,6 +50,7 @@ WHAT WE NEED
 		- Tomek
 	4. Opowieść o danych i opowieść o programie (m)
 		- ?
+		- Pokazać przykłady "prawilnych" literek oraz pokazać to, że zamiast liter pojawiają się np znaczki (rower/zwierzę itd)
 	5. Przedstawienie wyników (d)
 		- Tomek
 	6. Dyskusja (d)
