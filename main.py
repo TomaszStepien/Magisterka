@@ -8,15 +8,15 @@ import classifier1
 if __name__ == "__main__":
 
     if config.FLAG_PREPARE_DATASETS:
-        dl.prepare_final_datasets()
+        dl.prepare_final_datasets(config.DATASET_MAX)
 
     train_images, _, _, _ = dl.load_sets(path=config.GAN_LETTERS_PATH,
                                          sample_size=(100, 100),
-                                         classes_to_read=['A_1000'])
+                                         classes_to_read=['1000_A'])
 
     if config.FLAG_TRAIN_GAN:
         dcgan = dc_gan.DCGAN(pic_size=config.PIC_SIZE, channels=config.CHANNELS, num_classes=config.NUM_CLASSES)
-        dcgan.train(X_train=X_train, epochs=config.EPOCHS, batch_size=config.BATCH_SIZE, \
+        dcgan.train(X_train=train_images, epochs=config.EPOCHS, batch_size=config.BATCH_SIZE, \
                     save_interval=config.SAMPLE_INTERVAL)
 
     if config.FLAG_CLASSIFY:

@@ -138,63 +138,70 @@ def augment_sets(x_train, y_train, x_valid, y_valid):
     return x_train, y_train, x_valid, y_valid
 
 
-def prepare_final_datasets():
+def prepare_final_datasets(dataset_max):
     """
     Remove old directories, create new one.
     Randomly choose pictures from large dataset and copy them to created folders
     """
-    _remove_trash(config.FINAL_DATA_PATH)
+    _remove_trash(config.PATH_FINAL_DATA)
 
-    _prepare_folder(config.FINAL_DATA_PATH)
-    _prepare_folder(os.path.join(config.FINAL_DATA_PATH, 'first_assumption'))
-    _prepare_folder(config.GAN_LETTERS_PATH)
-    _prepare_folder(config.CLASS_LETTERS_PATH)
-    _prepare_folder(os.path.join(config.CLASS_LETTERS_PATH, '1000_1000'))
-    _prepare_folder(os.path.join(config.CLASS_LETTERS_PATH, '1000_1000', 'train'))
-    _prepare_folder(os.path.join(config.CLASS_LETTERS_PATH, '1000_1000', 'validation'))
+    _prepare_folder(config.PATH_FINAL_DATA)
+    _prepare_folder(config.PATH_FIRST)
+    _prepare_folder(config.PATH_GAN_LETTERS)
+    _prepare_folder(config.PATH_CLASS_LETTERS)
+
+    for path in config.PATH_CLASS_MAX_HALF_TEN:
+        _prepare_folder(path)
+        _prepare_folder(os.path.join(path, 'train'))
+        _prepare_folder(os.path.join(path, 'validation'))
+
 
     for letter in config.LETTERS:
         # GAN FILES
-        _prepare_folder(os.path.join(config.GAN_LETTERS_PATH, letter + '_1000'))
-        _prepare_folder(os.path.join(config.GAN_LETTERS_PATH, letter + '_500'))
-        _prepare_folder(os.path.join(config.GAN_LETTERS_PATH, letter + '_100'))
+        for path in config.PATH_GAN_MAX_HALF_TEN:
+            _prepare_folder(path+letter)
 
         # CLASS FILES
-        _prepare_folder(os.path.join(config.CLASS_LETTERS_PATH, '1000_1000', 'train', letter))
-        _prepare_folder(os.path.join(config.CLASS_LETTERS_PATH, '1000_1000', 'validation', letter))
+        for path in config.PATH_CLASS_MAX_HALF_TEN:
+            _prepare_folder(os.path.join(path, 'train', letter))
+            _prepare_folder(os.path.join(path, 'validation', letter))
 
     for letter in config.LETTERS:
+        # PREPARE LIST OF FILES
         letters_all = [f for f in listdir(os.path.join(config.DATA_PATH, letter)) if
                        isfile(join(os.path.join(config.DATA_PATH, letter), f))]
-        letters_1000 = random.sample(letters_all, 1000)
-        letters_500 = random.sample(letters_1000, 500)
-        letters_100 = random.sample(letters_500, 50)
+        letters_max = random.sample(letters_all, config.DATASET_MAX)
+        letters_half = random.sample(letters_max, int(config.DATASET_MAX/2))
+        letters_ten_p = random.sample(letters_half, int(config.DATASET_MAX*0.1))
 
         # COPY FILES TO GAN
         _copy_files(os.path.join(config.DATA_PATH, letter, ''),
-                    os.path.join(config.GAN_LETTERS_PATH, letter + '_1000', ''),
-                    letters_1000, letter)
+                    os.path.join(config.PATH_GAN_MAX+letter, ''),
+                    letters_max, letter)
         _copy_files(os.path.join(config.DATA_PATH, letter, ''),
-                    os.path.join(config.GAN_LETTERS_PATH, letter + '_500', ''),
-                    letters_500, letter)
+                    os.path.join(config.PATH_GAN_HALF+letter, ''),
+                    letters_half, letter)
         _copy_files(os.path.join(config.DATA_PATH, letter, ''),
-                    os.path.join(config.GAN_LETTERS_PATH, letter + '_100', ''),
-                    letters_100, letter)
+                    os.path.join(config.PATH_GAN_TEN_P+letter, ''),
+                    letters_ten_p, letter)
 
         # COPY FILES TO CLASS
-        _train_validation_dividing(letters_1000, letter, 0.7)
+        _train_validation_dividing(config.PATH_GAN_MAX+letter, config.PATH_CLASS_MAX, letters_max, letter, 0.7)
+        _train_validation_dividing(config.PATH_GAN_MAX+letter, config.PATH_CLASS_HALF, letters_half, letter, 0.7)
+        _train_validation_dividing(config.PATH_GAN_MAX+letter, config.PATH_CLASS_TEN_P, letters_ten_p, letter, 0.7)
 
 
-def _train_validation_dividing(files, letter, percentage):
+
+def _train_validation_dividing(source_path, destination_path, files, letter, percentage):
     sample = random.sample(files, int(len(files)*percentage))
     train = [x for x in files if x in sample]
     valid = [x for x in files if x not in sample]
 
-    _copy_files(os.path.join(config.GAN_LETTERS_PATH, letter + '_1000', ''),
-                os.path.join(config.CLASS_LETTERS_PATH, '1000_1000', 'train', letter, ''),
+    _copy_files(os.path.join(source_path, ''),
+                os.path.join(destination_path, 'train', letter, ''),
                 train, letter)
-    _copy_files(os.path.join(config.GAN_LETTERS_PATH, letter + '_1000', ''),
-                os.path.join(config.CLASS_LETTERS_PATH, '1000_1000', 'validation', letter, ''),
+    _copy_files(os.path.join(source_path, ''),
+                os.path.join(destination_path, 'validation', letter, ''),
                 valid, letter)
 
 
