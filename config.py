@@ -25,7 +25,7 @@ IMAGE_PATH = os.path.join(home, 'notMNIST_large')
 LETTERS = ['A', 'D']
 DATASET_MAX = 1000
 
-PATH_FINAL_DATA = GAN_LETTERS_PATH = os.path.join(home, 'MASTER_DATA')
+PATH_FINAL_DATA = os.path.join(home, 'MASTER_DATA')
 PATH_FIRST = os.path.join(PATH_FINAL_DATA, 'first_assumption')
 PATH_GAN_LETTERS = os.path.join(PATH_FIRST, 'GAN')
 PATH_CLASS_LETTERS = os.path.join(PATH_FIRST, 'CLASS')
@@ -36,11 +36,12 @@ PATH_CLASS_TEN_P = os.path.join(PATH_CLASS_LETTERS, f"{str(DATASET_MAX)}_{str(in
 
 PATH_CLASS_MAX_HALF_TEN = [PATH_CLASS_MAX, PATH_CLASS_HALF, PATH_CLASS_TEN_P]
 
-PATH_GAN_MAX = os.path.join(GAN_LETTERS_PATH, f"{str(DATASET_MAX)}_")
-PATH_GAN_HALF = os.path.join(GAN_LETTERS_PATH, f"{str(int(DATASET_MAX/2))}_")
-PATH_GAN_TEN_P = os.path.join(GAN_LETTERS_PATH, f"{str(int(DATASET_MAX*0.1))}_")
+PATH_GAN_MAX = os.path.join(PATH_GAN_LETTERS, f"{str(DATASET_MAX)}_")
+PATH_GAN_HALF = os.path.join(PATH_GAN_LETTERS, f"{str(int(DATASET_MAX/2))}_")
+PATH_GAN_TEN_P = os.path.join(PATH_GAN_LETTERS, f"{str(int(DATASET_MAX*0.1))}_")
 
 PATH_GAN_MAX_HALF_TEN = [PATH_GAN_MAX, PATH_GAN_HALF, PATH_GAN_TEN_P]
+
 
 def create_subfolder(directory):
     if not os.path.exists(directory):
@@ -70,5 +71,5 @@ KERNEL = (3, 3)
 
 # gan model parameters
 EPOCHS = 1000001  # todo
-BATCH_SIZE = 100
+BATCH_SIZE = 1
 SAMPLE_INTERVAL = 1000

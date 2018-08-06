@@ -3,7 +3,6 @@
 todo: try https://keras.io/preprocessing/image/
 """
 
-import operator
 import os
 import random
 import shutil
@@ -155,11 +154,10 @@ def prepare_final_datasets(dataset_max):
         _prepare_folder(os.path.join(path, 'train'))
         _prepare_folder(os.path.join(path, 'validation'))
 
-
     for letter in config.LETTERS:
         # GAN FILES
         for path in config.PATH_GAN_MAX_HALF_TEN:
-            _prepare_folder(path+letter)
+            _prepare_folder(path + letter)
 
         # CLASS FILES
         for path in config.PATH_CLASS_MAX_HALF_TEN:
@@ -171,29 +169,28 @@ def prepare_final_datasets(dataset_max):
         letters_all = [f for f in listdir(os.path.join(config.DATA_PATH, letter)) if
                        isfile(join(os.path.join(config.DATA_PATH, letter), f))]
         letters_max = random.sample(letters_all, config.DATASET_MAX)
-        letters_half = random.sample(letters_max, int(config.DATASET_MAX/2))
-        letters_ten_p = random.sample(letters_half, int(config.DATASET_MAX*0.1))
+        letters_half = random.sample(letters_max, int(config.DATASET_MAX / 2))
+        letters_ten_p = random.sample(letters_half, int(config.DATASET_MAX * 0.1))
 
         # COPY FILES TO GAN
         _copy_files(os.path.join(config.DATA_PATH, letter, ''),
-                    os.path.join(config.PATH_GAN_MAX+letter, ''),
+                    os.path.join(config.PATH_GAN_MAX + letter, ''),
                     letters_max, letter)
         _copy_files(os.path.join(config.DATA_PATH, letter, ''),
-                    os.path.join(config.PATH_GAN_HALF+letter, ''),
+                    os.path.join(config.PATH_GAN_HALF + letter, ''),
                     letters_half, letter)
         _copy_files(os.path.join(config.DATA_PATH, letter, ''),
-                    os.path.join(config.PATH_GAN_TEN_P+letter, ''),
+                    os.path.join(config.PATH_GAN_TEN_P + letter, ''),
                     letters_ten_p, letter)
 
         # COPY FILES TO CLASS
-        _train_validation_dividing(config.PATH_GAN_MAX+letter, config.PATH_CLASS_MAX, letters_max, letter, 0.7)
-        _train_validation_dividing(config.PATH_GAN_MAX+letter, config.PATH_CLASS_HALF, letters_half, letter, 0.7)
-        _train_validation_dividing(config.PATH_GAN_MAX+letter, config.PATH_CLASS_TEN_P, letters_ten_p, letter, 0.7)
-
+        _train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_MAX, letters_max, letter, 0.7)
+        _train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_HALF, letters_half, letter, 0.7)
+        _train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_TEN_P, letters_ten_p, letter, 0.7)
 
 
 def _train_validation_dividing(source_path, destination_path, files, letter, percentage):
-    sample = random.sample(files, int(len(files)*percentage))
+    sample = random.sample(files, int(len(files) * percentage))
     train = [x for x in files if x in sample]
     valid = [x for x in files if x not in sample]
 
