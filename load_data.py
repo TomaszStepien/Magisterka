@@ -164,6 +164,7 @@ def prepare_final_datasets(dataset_max):
             _prepare_folder(os.path.join(path, 'train', letter))
             _prepare_folder(os.path.join(path, 'validation', letter))
 
+    first = True
     for letter in config.LETTERS:
         # PREPARE LIST OF FILES
         letters_all = [f for f in listdir(os.path.join(config.DATA_PATH, letter)) if
@@ -184,10 +185,15 @@ def prepare_final_datasets(dataset_max):
                     letters_ten_p, letter)
 
         # COPY FILES TO CLASS
-        _train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_MAX, letters_max, letter, 0.7)
-        _train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_HALF, letters_half, letter, 0.7)
-        _train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_TEN_P, letters_ten_p, letter, 0.7)
-
+        if first:
+            _train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_MAX, letters_max, letter, 0.7)
+            _train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_HALF, letters_max, letter, 0.7)
+            _train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_TEN_P, letters_max, letter, 0.7)
+        else:
+            _train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_MAX, letters_max, letter, 0.7)
+            _train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_HALF, letters_half, letter, 0.7)
+            _train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_TEN_P, letters_ten_p, letter, 0.7)
+        first = False
 
 def _train_validation_dividing(source_path, destination_path, files, letter, percentage):
     sample = random.sample(files, int(len(files) * percentage))

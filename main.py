@@ -31,7 +31,7 @@ if __name__ == "__main__":
         home_path = os.path.join("C:\magisterka_data//MASTER_DATA//first_assumption", 'CLASS', '1000_100')
         nb_train_samples = 2000
         nb_validation_samples = 800
-        epochs = 5
+        epochs = 50
         batch_size = 16
 
         classifier1.train_classifier(home_path, img_width, img_height, epochs, batch_size)
