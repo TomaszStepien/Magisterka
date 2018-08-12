@@ -8,36 +8,66 @@ import gans.dcgan as dc_gan
 import load_data as dl
 import numpy as np
 
+
+def train_gans(option):
+    # Convert images to numpy arrays
+    X_train, _, _, _ = dl.load_sets(path=config.PATH_GAN_LETTERS,
+                                    sample_size=(100, 100),
+                                    classes_to_read=[f"{option[1]}_{letters[1]}"])
+    # CUDA settings
+    c = tf.ConfigProto()
+    c.gpu_options.allow_growth = True
+    session = tf.Session(config=c)
+    # Train GAN
+    dcgan = dc_gan.DCGAN(pic_size=config.PIC_SIZE, channels=config.CHANNELS,
+                         num_classes=config.NUM_CLASSES)
+    dcgan.train(X_train=X_train, epochs=config.EPOCHS, batch_size=config.BATCH_SIZE,
+                save_interval=config.SAMPLE_INTERVAL)
+    return dcgan
+
+
 if __name__ == "__main__":
 
-    for letters in config.LETTERS:
-        if config.FLAG_PREPARE_DATASETS:
-            dl.prepare_final_datasets(letters)
+    try_balance = False
 
-        X_train, _, _, _ = dl.load_sets(path=config.PATH_GAN_LETTERS,
-                                        sample_size=(100, 100),
-                                        classes_to_read=['100_A'])
+    for option in config.DATASETS_OPTIONS:
+        option = [int(option[0]), int(option[1])]
+        for letters in config.LETTERS:
+            if config.FLAG_PREPARE_DATASETS:
+                dl.prepare_final_datasets(letters)
 
-        if config.FLAG_TRAIN_GAN:
-            # (Ustawienia do CUDA)
-            c = tf.ConfigProto()
-            c.gpu_options.allow_growth = True
-            session = tf.Session(config=c)
+            if (option[0] == option[1]):
+                pass
+            else:
+                if config.FLAG_TRAIN_GAN:
+                    dcgan = train_gans(option)
 
-            dcgan = dc_gan.DCGAN(pic_size=config.PIC_SIZE, channels=config.CHANNELS, num_classes=config.NUM_CLASSES)
-            dcgan.train(X_train=X_train, epochs=config.EPOCHS, batch_size=config.BATCH_SIZE, \
-                        save_interval=config.SAMPLE_INTERVAL)
+                if config.FLAG_GENERATE_IMAGES:
+                    path_first_letter = os.path.join(config.PATH_CLASS_LETTERS, f"{option[0]}_{option[1]}_GAN",
+                                                     'generated', letters[0])
+                    path_second_letter = os.path.join(config.PATH_CLASS_LETTERS, f"{option[0]}_{option[1]}_GAN",
+                                                      'generated', letters[1])
 
-        if config.FLAG_GENERATE_IMAGES:
-            path = os.path.join("C:\magisterka_data//MASTER_DATA//first_assumption", 'CLASS', '1000_100')
-            dcgan.save_imgs(path=path, full=True, amount=100, figsize=config.PIC_SIZE)
+                    dcgan.save_imgs(path=path_second_letter, full=True, amount=option[1])
+                    dl.train_validation_dividing(source_path=path_first_letter,
+                                                 destination_path=os.path.join(config.PATH_CLASS_LETTERS,
+                                                                               f"{option[0]}_{option[1]}_GAN"),
+                                                 files=[], letter=letters[0], percentage=0.7)
+                    dl.train_validation_dividing(source_path=path_second_letter,
+                                                 destination_path=os.path.join(config.PATH_CLASS_LETTERS,
+                                                                               f"{option[0]}_{option[1]}_GAN"),
+                                                 files=[], letter=letters[1], percentage=0.7)
 
-        if config.FLAG_CLASSIFY:
-            img_width, img_height = 28, 28
-            home_path = os.path.join("C:\magisterka_data//MASTER_DATA//first_assumption", 'CLASS', '1000_100')
-            nb_train_samples = 2000
-            nb_validation_samples = 800
-            epochs = 500
-            batch_size = 16
+            if config.FLAG_CLASSIFY:
+                img_width, img_height = config.PIC_SIZE[0], config.PIC_SIZE[1]
+                if try_balance:
+                    home_path = os.path.join(config.PATH_CLASS_LETTERS, f"{option[0]}_{option[1]}_GAN")
+                else:
+                    home_path = os.path.join(config.PATH_CLASS_LETTERS, f"{option[0]}_{option[1]}")
 
-            classifier1.train_classifier(home_path, img_width, img_height, epochs, batch_size)
+                nb_train_samples = 2000
+                nb_validation_samples = 800
+                epochs = 500
+                batch_size = 16
+
+                classifier1.train_classifier(home_path, img_width, img_height, epochs, batch_size)

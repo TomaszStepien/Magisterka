@@ -142,7 +142,6 @@ def prepare_final_datasets(letters):
     Remove old directories, create new one.
     Randomly choose pictures from large dataset and copy them to created folders
     """
-
     _prepare_folder(config.PATH_FINAL_DATA)
     _prepare_folder(config.PATH_ROOT)
     _prepare_folder(config.PATH_GAN_LETTERS)
@@ -204,11 +203,11 @@ def prepare_final_datasets(letters):
 
         if first:
             # COPY FILES TO CLASS
-            _train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_MAX, letters_max, letter,
+            train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_MAX, letters_max, letter,
                                        0.7)
-            _train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_HALF, letters_max, letter,
+            train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_HALF, letters_max, letter,
                                        0.7)
-            _train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_TEN_P, letters_max, letter,
+            train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_TEN_P, letters_max, letter,
                                        0.7)
 
             # COPY FILES TO CLASS (+ GENERATED PHOTOS)
@@ -224,11 +223,11 @@ def prepare_final_datasets(letters):
 
         else:
             # COPY FILES TO CLASS
-            _train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_MAX, letters_max, letter,
+            train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_MAX, letters_max, letter,
                                        0.7)
-            _train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_HALF, letters_half, letter,
+            train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_HALF, letters_half, letter,
                                        0.7)
-            _train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_TEN_P, letters_ten_p, letter,
+            train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_TEN_P, letters_ten_p, letter,
                                        0.7)
 
             # COPY FILES TO CLASS (+ GENERATED PHOTOS)
@@ -243,7 +242,10 @@ def prepare_final_datasets(letters):
                         letters_ten_p, letter)
         first = False
 
-def _train_validation_dividing(source_path, destination_path, files, letter, percentage):
+
+def train_validation_dividing(source_path, destination_path, files, letter, percentage):
+    if len(files) == 0:
+        files = [f for f in listdir(source_path) if isfile(join(source_path, f))]
     sample = random.sample(files, int(len(files) * percentage))
     train = [x for x in files if x in sample]
     valid = [x for x in files if x not in sample]

@@ -27,8 +27,7 @@ DATASET_MAX = 1000
 DATASETS_LIST = [f"{str(DATASET_MAX)}_{str(DATASET_MAX)}",
                  f"{str(DATASET_MAX)}_{str(int(DATASET_MAX/2))}",
                  f"{str(DATASET_MAX)}_{str(int(DATASET_MAX*0.1))}"]
-
-DATASETS_ROOT_LIST = ['A_D', 'G_C', 'I_J']
+DATASETS_OPTIONS = [[DATASET_MAX, DATASET_MAX], [DATASET_MAX, DATASET_MAX/2], [DATASET_MAX, DATASET_MAX*0.1]]
 
 PATH_FINAL_DATA = os.path.join(home, 'MASTER_DATA')
 PATH_ROOT = os.path.join(PATH_FINAL_DATA, 'root')
@@ -65,9 +64,9 @@ for f in (SAVED_FILES, SAVED_IMAGES, SAVED_MODELS, CLASS_DATA_PATH, STATS_FILES)
 
 # setup flags
 FLAG_PREPARE_DATASETS = True
-FLAG_TRAIN_GAN = False
+FLAG_TRAIN_GAN = True
 FLAG_CLASSIFY = False
-FLAG_GENERATE_IMAGES = False
+FLAG_GENERATE_IMAGES = True
 
 # dataset fixed values
 PIC_SIZE = (28, 28)  # only odd numbers
