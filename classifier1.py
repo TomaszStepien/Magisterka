@@ -54,7 +54,7 @@ def train_classifier(home_path, option, folder, img_width, img_height, nb_train_
                                   validation_steps=nb_validation_samples // batch_size,
                                   callbacks=[csv_logger])
 
-    _save_plots(history, home_path)
+    _save_plots(history, os.path.join(config.PATH_STATS), option, folder)
 
 
 def _create_model(input_shape):
@@ -81,7 +81,7 @@ def _create_model(input_shape):
     return model
 
 
-def _save_plots(history, home_path):
+def _save_plots(history, path, option, folder):
     plt.figure(figsize=[8, 6])
     plt.plot(history.history['loss'], 'r', linewidth=3.0)
     plt.plot(history.history['val_loss'], 'b', linewidth=3.0)
@@ -89,7 +89,7 @@ def _save_plots(history, home_path):
     plt.xlabel('Epochs ', fontsize=16)
     plt.ylabel('Loss', fontsize=16)
     plt.title('Loss Curves', fontsize=16)
-    plt.savefig(os.path.join(home_path, 'loss.png'))
+    plt.savefig(os.path.join(path, f"{option}_{folder}_loss.png"))
 
     plt.figure(figsize=[8, 6])
     plt.plot(history.history['acc'], 'r', linewidth=3.0)
@@ -98,4 +98,4 @@ def _save_plots(history, home_path):
     plt.xlabel('Epochs ', fontsize=16)
     plt.ylabel('Accuracy', fontsize=16)
     plt.title('Accuracy Curves', fontsize=16)
-    plt.savefig(os.path.join(home_path, 'accuracy.png'))
+    plt.savefig(os.path.join(path, f"{option}_{folder}_accuracy.png"))

@@ -16,6 +16,7 @@ from keras.preprocessing.image import img_to_array, load_img
 from keras.utils import to_categorical
 
 import config
+from src.tools import processing
 
 
 def load_images_into_array(path, pic_size=config.PIC_SIZE, sample_size=-1):
@@ -167,6 +168,7 @@ def prepare_final_datasets(letters):
     _prepare_folder(config.PATH_FINAL_DATA)
     _prepare_folder(config.PATH_ROOT)
     _prepare_folder(config.PATH_STATS)
+    _prepare_folder(config.PATH_STATS_GAN)
     _prepare_folder(config.PATH_GAN_LETTERS)
     _prepare_folder(config.PATH_CLASS_LETTERS)
 
@@ -184,8 +186,7 @@ def prepare_final_datasets(letters):
     first = True
     for letter in letters:
         # PREPARE LIST OF FILES
-        letters_all = [f for f in listdir(os.path.join(config.DATA_PATH, letter)) if
-                        isfile(join(os.path.join(config.DATA_PATH, letter), f))]
+        letters_all = processing.return_all_files(os.path.join(config.DATA_PATH, letter))
         letters_dict[letter]['max'] = random.sample(letters_all, config.DATASET_MAX)
         letters_dict[letter]['half'] = random.sample(letters_dict[letter]['max'], int(config.DATASET_MAX / 2))
         letters_dict[letter]['ten_p'] = random.sample(letters_dict[letter]['half'], int(config.DATASET_MAX * 0.1))
@@ -204,13 +205,13 @@ def prepare_final_datasets(letters):
     # COPY FILES TO CLASS
     train_validation_dividing(config.PATH_GAN_MAX + letters[0],
                               os.path.join(config.PATH_CLASS_MAX, f"{letters[0]}_{letters[1]}"),
-                              letters_dict[letters[0]]['max'], letters[0], 0.7)
+                              letters_dict[letters[0]]['max'], letters[0], config.PROPORTION)
     train_validation_dividing(config.PATH_GAN_MAX + letters[0],
                               os.path.join(config.PATH_CLASS_HALF, f"{letters[0]}_{letters[1]}"),
-                              letters_dict[letters[0]]['max'], letters[0], 0.7)
+                              letters_dict[letters[0]]['max'], letters[0], config.PROPORTION)
     train_validation_dividing(config.PATH_GAN_MAX + letters[0],
                               os.path.join(config.PATH_CLASS_TEN_P, f"{letters[0]}_{letters[1]}"),
-                              letters_dict[letters[0]]['max'], letters[0], 0.7)
+                              letters_dict[letters[0]]['max'], letters[0], config.PROPORTION)
 
     # COPY FILES TO CLASS (+ GENERATED PHOTOS)
     _copy_files(os.path.join(config.DATA_PATH, letters[0], ''),
@@ -225,13 +226,13 @@ def prepare_final_datasets(letters):
 
     train_validation_dividing(config.PATH_GAN_MAX + letters[1],
                               os.path.join(config.PATH_CLASS_MAX, f"{letters[0]}_{letters[1]}"),
-                              letters_dict[letters[1]]['max'], letters[1], 0.7)
+                              letters_dict[letters[1]]['max'], letters[1], config.PROPORTION)
     train_validation_dividing(config.PATH_GAN_MAX + letters[1],
                               os.path.join(config.PATH_CLASS_HALF, f"{letters[0]}_{letters[1]}"),
-                              letters_dict[letters[1]]['half'], letters[1], 0.7)
+                              letters_dict[letters[1]]['half'], letters[1], config.PROPORTION)
     train_validation_dividing(config.PATH_GAN_MAX + letters[1],
                               os.path.join(config.PATH_CLASS_TEN_P, f"{letters[0]}_{letters[1]}"),
-                              letters_dict[letters[1]]['ten_p'], letters[1], 0.7)
+                              letters_dict[letters[1]]['ten_p'], letters[1], config.PROPORTION)
 
     # COPY FILES TO CLASS (+ GENERATED PHOTOS)
     _copy_files(os.path.join(config.DATA_PATH, letters[1], ''),

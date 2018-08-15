@@ -13,35 +13,45 @@ from src.tools import processing
 def train_gans(option):
     # Convert images to numpy arrays
     X_train, _, _, _ = dl.load_sets(path=config.PATH_GAN_LETTERS,
-                                    sample_size=(100, 100),
+                                    sample_size=(int(option[1]), 100),
                                     classes_to_read=[f"{option[1]}_{letters[1]}"])
     # CUDA settings
     c = tf.ConfigProto()
     c.gpu_options.allow_growth = True
     session = tf.Session(config=c)
     # Train GAN
-    dcgan = dc_gan.DCGAN(pic_size=config.PIC_SIZE, channels=config.CHANNELS,
+    dcgan = dc_gan.DCGAN(pic_size=config.PIC_SIZE,channels=config.CHANNELS,
                          num_classes=config.NUM_CLASSES)
-    dcgan.train(X_train=X_train, epochs=config.EPOCHS, batch_size=config.BATCH_SIZE,
-                save_interval=config.SAMPLE_INTERVAL)
+    dcgan.train(X_train=X_train,
+                epochs=config.EPOCHS_GAN,
+                batch_size=config.BATCH_SIZE,
+                save_interval=config.SAMPLE_INTERVAL,
+                stats_path=os.path.join(config.PATH_STATS_GAN, f"{option[1]}_{letters[1]}.csv"))
     return dcgan
 
 
 def generate_images(option, dcgan):
     path_first_letter = os.path.join(config.PATH_CLASS_LETTERS, f"{option[0]}_{option[1]}_GAN",
+                                     f"{letters[0]}_{letters[1]}",
                                      'generated', letters[0])
     path_second_letter = os.path.join(config.PATH_CLASS_LETTERS, f"{option[0]}_{option[1]}_GAN",
+                                      f"{letters[0]}_{letters[1]}",
                                       'generated', letters[1])
+
     dcgan.save_imgs(path=path_second_letter, full=True, amount=option[1])
 
     dl.train_validation_dividing(source_path=path_first_letter,
                                  destination_path=os.path.join(config.PATH_CLASS_LETTERS,
-                                                               f"{option[0]}_{option[1]}_GAN"),
-                                 files=[], letter=letters[0], percentage=0.7)
+                                                               f"{option[0]}_{option[1]}_GAN",
+                                                               f"{letters[0]}_{letters[1]}"),
+                                 files=processing.return_all_files(path_first_letter), letter=letters[0],
+                                 percentage=config.PROPORTION)
     dl.train_validation_dividing(source_path=path_second_letter,
                                  destination_path=os.path.join(config.PATH_CLASS_LETTERS,
-                                                               f"{option[0]}_{option[1]}_GAN"),
-                                 files=[], letter=letters[1], percentage=0.7)
+                                                               f"{option[0]}_{option[1]}_GAN",
+                                                               f"{letters[0]}_{letters[1]}"),
+                                 files=processing.return_all_files(path_second_letter), letter=letters[1],
+                                 percentage=config.PROPORTION)
 
 
 def classify_images(path, option, folder):
@@ -61,7 +71,7 @@ def classify_images(path, option, folder):
         nb_train_samples = amount * config.PROPORTION
         nb_validation_samples = amount - nb_train_samples
 
-        epochs = config.EPOCHS
+        epochs = config.EPOCHS_CLASS
         batch_size = config.BATCH_SIZE
         classifier1.train_classifier(home_path, option, folder, img_width, img_height, nb_train_samples,
                                      nb_validation_samples, epochs, batch_size)
@@ -78,7 +88,6 @@ if __name__ == "__main__":
     for index, option in enumerate(config.DATASETS_OPTIONS):
         option = [int(option[0]), int(option[1])]
         for letters in config.LETTERS:
-
             if config.FLAG_TRAIN_GAN:
                 if index == 0:
                     pass
@@ -87,16 +96,19 @@ if __name__ == "__main__":
                     dcgan = train_gans(option)
                     processing.end_process(processing_time, 'training GAN')
 
-                if config.FLAG_GENERATE_IMAGES:
-                    processing_time = processing.start_process('generating images')
-                    generate_images(option, dcgan)
-                    processing.end_process(processing_time, 'generating images')
+                    if config.FLAG_GENERATE_IMAGES:
+                        processing_time = processing.start_process('generating images')
+                        generate_images(option, dcgan)
+                        processing.end_process(processing_time, 'generating images')
 
-        if config.FLAG_CLASSIFY:
-            processing_time = processing.start_process('classifying images')
-            option_folders = os.listdir(config.PATH_CLASS_LETTERS)
-            for option in option_folders:
-                to_classify = os.listdir(os.path.join(config.PATH_CLASS_LETTERS, option))
-                for folder in to_classify:
-                    classify_images(config.PATH_CLASS_LETTERS, option, folder)
-                processing.end_process(processing_time, 'classifying images')
+    for index, option in enumerate(config.DATASETS_OPTIONS):
+        option = [int(option[0]), int(option[1])]
+        for letters in config.LETTERS:
+            if config.FLAG_CLASSIFY:
+                processing_time = processing.start_process('classifying images')
+                option_folders = os.listdir(config.PATH_CLASS_LETTERS)
+                for option in option_folders:
+                    to_classify = os.listdir(os.path.join(config.PATH_CLASS_LETTERS, option))
+                    for folder in to_classify:
+                        classify_images(config.PATH_CLASS_LETTERS, option, folder)
+                    processing.end_process(processing_time, 'classifying images')

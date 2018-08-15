@@ -107,9 +107,8 @@ class DCGAN():
 
         return Model(img, validity)
 
-    def train(self, X_train, epochs, batch_size=128, save_interval=50):
+    def train(self, X_train, epochs, batch_size=128, save_interval=50, stats_path='gan_output.csv'):
         start_time = datetime.datetime.now()
-        folder_name = "DCGAN_" + start_time.strftime("%Y_%m_%d__%H_%M") + "/"
         images_path = config.SAVED_IMAGES
         models_path = config.SAVED_MODELS
 
@@ -150,7 +149,7 @@ class DCGAN():
             computation_time = str(datetime.datetime.now() - start_time)
             print("%d [D loss: %f, acc.: %.2f%%] [G loss: %f] exec.time: %s" % (
                 epoch, d_loss[0], 100 * d_loss[1], g_loss, computation_time))
-            with open('stats_file.csv', 'a', newline='') as outfile:
+            with open(stats_path, 'a', newline='') as outfile:
                 writer = csv.writer(outfile)
                 writer.writerow([epoch, d_loss[0], 100 * d_loss[1], g_loss, computation_time])
 

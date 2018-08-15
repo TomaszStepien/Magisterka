@@ -7,10 +7,10 @@ import os
 import sys
 
 # setup flags
-FLAG_PREPARE_DATASETS = False
-FLAG_TRAIN_GAN = False
+FLAG_PREPARE_DATASETS = True
+FLAG_TRAIN_GAN = True
+FLAG_GENERATE_IMAGES = True
 FLAG_CLASSIFY = True
-FLAG_GENERATE_IMAGES = False
 
 
 # create folder structure
@@ -30,8 +30,6 @@ STATS_FILES = home + 'saved_files/stats_files/'
 IMAGE_PATH = os.path.join(home, 'notMNIST_large')
 
 LETTERS = [['A', 'D'], ['G', 'C'], ['I', 'J']]
-
-LETTERS = [['A', 'D']]
 DATASET_MAX = 1000
 DATASETS_LIST = [f"{str(DATASET_MAX)}_{str(DATASET_MAX)}",
                  f"{str(DATASET_MAX)}_{str(int(DATASET_MAX/2))}",
@@ -40,7 +38,8 @@ DATASETS_OPTIONS = [[DATASET_MAX, DATASET_MAX], [DATASET_MAX, DATASET_MAX/2], [D
 
 PATH_FINAL_DATA = os.path.join(home, 'MASTER_DATA')
 PATH_ROOT = os.path.join(PATH_FINAL_DATA, 'root')
-PATH_STATS = os.path.join(PATH_FINAL_DATA, 'stats')
+PATH_STATS = os.path.join(PATH_FINAL_DATA, 'stats_class')
+PATH_STATS_GAN = os.path.join(PATH_FINAL_DATA, 'stats_gan')
 PATH_GAN_LETTERS = os.path.join(PATH_ROOT, 'GAN')
 PATH_CLASS_LETTERS = os.path.join(PATH_ROOT, 'CLASS')
 
@@ -80,7 +79,8 @@ CLASSES_TO_READ = ('B', 'D')
 
 
 # gan model parameters
-EPOCHS = 1  # todo
+EPOCHS_GAN = 10000  # todo
+EPOCHS_CLASS = 1000
 BATCH_SIZE = 16
 SAMPLE_INTERVAL = 1000
 PROPORTION = 0.7
