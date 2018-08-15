@@ -8,24 +8,27 @@ from keras import backend as K
 import os
 from keras.callbacks import CSVLogger
 import tensorflow as tf
+import config
 
 
-def train_classifier(home_path, img_width, img_height, epochs, batch_size):
+def train_classifier(home_path, option, folder, img_width, img_height, nb_train_samples, nb_validation_samples, epochs,
+                     batch_size):
     # (Ustawienia do CUDA)
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
-    session = tf.Session(config=config)
+    cf = tf.ConfigProto()
+    cf.gpu_options.allow_growth = True
+    session = tf.Session(config=cf)
 
     if K.image_data_format() == 'channels_first':
         input_shape = (3, img_width, img_height)
     else:
         input_shape = (img_width, img_height, 3)
 
-    csv_logger = CSVLogger(os.path.join(home_path, 'class_output.csv'), append=True, separator=';')
+    csv_logger = CSVLogger(os.path.join(config.PATH_STATS, f"{option}_{folder}_class_output.csv"), append=True,
+                           separator=';')
     train_data_dir = os.path.join(home_path, 'train', '')
     validation_data_dir = os.path.join(home_path, 'validation', '')
-    nb_train_samples = 2000
-    nb_validation_samples = 800
+    nb_train_samples = nb_train_samples
+    nb_validation_samples = nb_validation_samples
     model = _create_model(input_shape)
     model.compile(loss='binary_crossentropy',
                   optimizer='rmsprop',
@@ -79,7 +82,6 @@ def _create_model(input_shape):
 
 
 def _save_plots(history, home_path):
-
     plt.figure(figsize=[8, 6])
     plt.plot(history.history['loss'], 'r', linewidth=3.0)
     plt.plot(history.history['val_loss'], 'b', linewidth=3.0)

@@ -6,6 +6,13 @@ also creates repository structure
 import os
 import sys
 
+# setup flags
+FLAG_PREPARE_DATASETS = False
+FLAG_TRAIN_GAN = False
+FLAG_CLASSIFY = True
+FLAG_GENERATE_IMAGES = False
+
+
 # create folder structure
 if sys.platform.startswith('linux'):
     home = "/home/tomasz/magisterka_data/"
@@ -23,6 +30,8 @@ STATS_FILES = home + 'saved_files/stats_files/'
 IMAGE_PATH = os.path.join(home, 'notMNIST_large')
 
 LETTERS = [['A', 'D'], ['G', 'C'], ['I', 'J']]
+
+LETTERS = [['A', 'D']]
 DATASET_MAX = 1000
 DATASETS_LIST = [f"{str(DATASET_MAX)}_{str(DATASET_MAX)}",
                  f"{str(DATASET_MAX)}_{str(int(DATASET_MAX/2))}",
@@ -31,6 +40,7 @@ DATASETS_OPTIONS = [[DATASET_MAX, DATASET_MAX], [DATASET_MAX, DATASET_MAX/2], [D
 
 PATH_FINAL_DATA = os.path.join(home, 'MASTER_DATA')
 PATH_ROOT = os.path.join(PATH_FINAL_DATA, 'root')
+PATH_STATS = os.path.join(PATH_FINAL_DATA, 'stats')
 PATH_GAN_LETTERS = os.path.join(PATH_ROOT, 'GAN')
 PATH_CLASS_LETTERS = os.path.join(PATH_ROOT, 'CLASS')
 
@@ -62,25 +72,15 @@ def create_subfolder(directory):
 for f in (SAVED_FILES, SAVED_IMAGES, SAVED_MODELS, CLASS_DATA_PATH, STATS_FILES):
     create_subfolder(f)
 
-# setup flags
-FLAG_PREPARE_DATASETS = True
-FLAG_TRAIN_GAN = True
-FLAG_CLASSIFY = False
-FLAG_GENERATE_IMAGES = True
-
 # dataset fixed values
 PIC_SIZE = (28, 28)  # only odd numbers
 CHANNELS = 3
 NUM_CLASSES = 1
 CLASSES_TO_READ = ('B', 'D')
 
-# classification model parameters
-N_LAYERS = 4
-MIN_NEURONS = 20
-MAX_NEURONS = 120
-KERNEL = (3, 3)
 
 # gan model parameters
 EPOCHS = 1  # todo
-BATCH_SIZE = 1
+BATCH_SIZE = 16
 SAMPLE_INTERVAL = 1000
+PROPORTION = 0.7

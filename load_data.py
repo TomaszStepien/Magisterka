@@ -6,6 +6,7 @@ todo: try https://keras.io/preprocessing/image/
 import os
 import random
 import shutil
+from collections import defaultdict
 from os import listdir
 from os.path import isfile, join
 from random import shuffle
@@ -137,26 +138,40 @@ def augment_sets(x_train, y_train, x_valid, y_valid):
     return x_train, y_train, x_valid, y_valid
 
 
+def _prepare_classification_folders(folders_list, letters, gan=False):
+    for path in folders_list:
+        current_path = os.path.join(path, f"{letters[0]}_{letters[1]}")
+        _prepare_folder(path)
+        _prepare_folder(current_path)
+        _prepare_folder(os.path.join(current_path, 'train'))
+        _prepare_folder(os.path.join(current_path, 'validation'))
+        if gan:
+            _prepare_folder(os.path.join(current_path, 'generated'))
+
+        for letter in letters:
+            _remove_trash(os.path.join(current_path, 'train', letter))
+            _remove_trash(os.path.join(current_path, 'validation', letter))
+            _prepare_folder(os.path.join(current_path, 'train', letter))
+            _prepare_folder(os.path.join(current_path, 'validation', letter))
+            if gan:
+                _remove_trash(os.path.join(current_path, 'generated', letter))
+                _prepare_folder(os.path.join(current_path, 'generated', letter))
+
+
 def prepare_final_datasets(letters):
     """
     Remove old directories, create new one.
     Randomly choose pictures from large dataset and copy them to created folders
     """
+
     _prepare_folder(config.PATH_FINAL_DATA)
     _prepare_folder(config.PATH_ROOT)
+    _prepare_folder(config.PATH_STATS)
     _prepare_folder(config.PATH_GAN_LETTERS)
     _prepare_folder(config.PATH_CLASS_LETTERS)
 
-    for path in config.PATH_CLASS_MAX_HALF_TEN:
-        _prepare_folder(path)
-        _prepare_folder(os.path.join(path, 'train'))
-        _prepare_folder(os.path.join(path, 'validation'))
-
-    for path in config.PATH_CLASS_GAN:
-        _prepare_folder(path)
-        _prepare_folder(os.path.join(path, 'train'))
-        _prepare_folder(os.path.join(path, 'validation'))
-        _prepare_folder(os.path.join(path, 'generated'))
+    _prepare_classification_folders(config.PATH_CLASS_MAX_HALF_TEN, letters)
+    _prepare_classification_folders(config.PATH_CLASS_GAN, letters, gan=True)
 
     """ PREPARE SUBFOLDERS WITH LETTERS"""
     for letter in letters:
@@ -165,82 +180,69 @@ def prepare_final_datasets(letters):
             _remove_trash(path + letter)
             _prepare_folder(path + letter)
 
-        # CLASS FILES
-        for path in config.PATH_CLASS_MAX_HALF_TEN:
-            _remove_trash(os.path.join(path, 'train', letter))
-            _remove_trash(os.path.join(path, 'validation', letter))
-            _prepare_folder(os.path.join(path, 'train', letter))
-            _prepare_folder(os.path.join(path, 'validation', letter))
-
-        # CLASS (+ GENERATED PHOTOS) FILES
-        for path in config.PATH_CLASS_GAN:
-            _remove_trash(os.path.join(path, 'train', letter))
-            _remove_trash(os.path.join(path, 'validation', letter))
-            _remove_trash(os.path.join(path, 'generated', letter))
-            _prepare_folder(os.path.join(path, 'train', letter))
-            _prepare_folder(os.path.join(path, 'validation', letter))
-            _prepare_folder(os.path.join(path, 'generated', letter))
-
+    letters_dict = defaultdict(dict)
     first = True
     for letter in letters:
         # PREPARE LIST OF FILES
         letters_all = [f for f in listdir(os.path.join(config.DATA_PATH, letter)) if
-                       isfile(join(os.path.join(config.DATA_PATH, letter), f))]
-        letters_max = random.sample(letters_all, config.DATASET_MAX)
-        letters_half = random.sample(letters_max, int(config.DATASET_MAX / 2))
-        letters_ten_p = random.sample(letters_half, int(config.DATASET_MAX * 0.1))
+                        isfile(join(os.path.join(config.DATA_PATH, letter), f))]
+        letters_dict[letter]['max'] = random.sample(letters_all, config.DATASET_MAX)
+        letters_dict[letter]['half'] = random.sample(letters_dict[letter]['max'], int(config.DATASET_MAX / 2))
+        letters_dict[letter]['ten_p'] = random.sample(letters_dict[letter]['half'], int(config.DATASET_MAX * 0.1))
 
         # COPY FILES TO GAN
         _copy_files(os.path.join(config.DATA_PATH, letter, ''),
                     os.path.join(config.PATH_GAN_MAX + letter, ''),
-                    letters_max, letter)
+                    letters_dict[letter]['max'], letter)
         _copy_files(os.path.join(config.DATA_PATH, letter, ''),
                     os.path.join(config.PATH_GAN_HALF + letter, ''),
-                    letters_half, letter)
+                    letters_dict[letter]['half'], letter)
         _copy_files(os.path.join(config.DATA_PATH, letter, ''),
                     os.path.join(config.PATH_GAN_TEN_P + letter, ''),
-                    letters_ten_p, letter)
+                    letters_dict[letter]['ten_p'], letter)
 
-        if first:
-            # COPY FILES TO CLASS
-            train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_MAX, letters_max, letter,
-                                       0.7)
-            train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_HALF, letters_max, letter,
-                                       0.7)
-            train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_TEN_P, letters_max, letter,
-                                       0.7)
+    # COPY FILES TO CLASS
+    train_validation_dividing(config.PATH_GAN_MAX + letters[0],
+                              os.path.join(config.PATH_CLASS_MAX, f"{letters[0]}_{letters[1]}"),
+                              letters_dict[letters[0]]['max'], letters[0], 0.7)
+    train_validation_dividing(config.PATH_GAN_MAX + letters[0],
+                              os.path.join(config.PATH_CLASS_HALF, f"{letters[0]}_{letters[1]}"),
+                              letters_dict[letters[0]]['max'], letters[0], 0.7)
+    train_validation_dividing(config.PATH_GAN_MAX + letters[0],
+                              os.path.join(config.PATH_CLASS_TEN_P, f"{letters[0]}_{letters[1]}"),
+                              letters_dict[letters[0]]['max'], letters[0], 0.7)
 
-            # COPY FILES TO CLASS (+ GENERATED PHOTOS)
-            _copy_files(os.path.join(config.DATA_PATH, letter, ''),
-                        os.path.join(config.PATH_CLASS_GAN_MAX, 'generated', letter, ''),
-                        letters_max, letter)
-            _copy_files(os.path.join(config.DATA_PATH, letter, ''),
-                        os.path.join(config.PATH_CLASS_GAN_HALF, 'generated', letter, ''),
-                        letters_max, letter)
-            _copy_files(os.path.join(config.DATA_PATH, letter, ''),
-                        os.path.join(config.PATH_CLASS_GAN_TEN_P, 'generated', letter, ''),
-                        letters_max, letter)
+    # COPY FILES TO CLASS (+ GENERATED PHOTOS)
+    _copy_files(os.path.join(config.DATA_PATH, letters[0], ''),
+                os.path.join(config.PATH_CLASS_GAN_MAX, f"{letters[0]}_{letters[1]}", 'generated', letters[0], ''),
+                letters_dict[letters[0]]['max'], letters[0])
+    _copy_files(os.path.join(config.DATA_PATH, letters[0], ''),
+                os.path.join(config.PATH_CLASS_GAN_HALF, f"{letters[0]}_{letters[1]}", 'generated', letters[0], ''),
+                letters_dict[letters[0]]['max'], letters[0])
+    _copy_files(os.path.join(config.DATA_PATH, letters[0], ''),
+                os.path.join(config.PATH_CLASS_GAN_TEN_P, f"{letters[0]}_{letters[1]}", 'generated', letters[0], ''),
+                letters_dict[letters[0]]['max'], letters[0])
 
-        else:
-            # COPY FILES TO CLASS
-            train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_MAX, letters_max, letter,
-                                       0.7)
-            train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_HALF, letters_half, letter,
-                                       0.7)
-            train_validation_dividing(config.PATH_GAN_MAX + letter, config.PATH_CLASS_TEN_P, letters_ten_p, letter,
-                                       0.7)
+    train_validation_dividing(config.PATH_GAN_MAX + letters[1],
+                              os.path.join(config.PATH_CLASS_MAX, f"{letters[0]}_{letters[1]}"),
+                              letters_dict[letters[1]]['max'], letters[1], 0.7)
+    train_validation_dividing(config.PATH_GAN_MAX + letters[1],
+                              os.path.join(config.PATH_CLASS_HALF, f"{letters[0]}_{letters[1]}"),
+                              letters_dict[letters[1]]['half'], letters[1], 0.7)
+    train_validation_dividing(config.PATH_GAN_MAX + letters[1],
+                              os.path.join(config.PATH_CLASS_TEN_P, f"{letters[0]}_{letters[1]}"),
+                              letters_dict[letters[1]]['ten_p'], letters[1], 0.7)
 
-            # COPY FILES TO CLASS (+ GENERATED PHOTOS)
-            _copy_files(os.path.join(config.DATA_PATH, letter, ''),
-                        os.path.join(config.PATH_CLASS_GAN_MAX, 'generated', letter, ''),
-                        letters_max, letter)
-            _copy_files(os.path.join(config.DATA_PATH, letter, ''),
-                        os.path.join(config.PATH_CLASS_GAN_HALF, 'generated', letter, ''),
-                        letters_half, letter)
-            _copy_files(os.path.join(config.DATA_PATH, letter, ''),
-                        os.path.join(config.PATH_CLASS_GAN_TEN_P, 'generated', letter, ''),
-                        letters_ten_p, letter)
-        first = False
+    # COPY FILES TO CLASS (+ GENERATED PHOTOS)
+    _copy_files(os.path.join(config.DATA_PATH, letters[1], ''),
+                os.path.join(config.PATH_CLASS_GAN_MAX, f"{letters[0]}_{letters[1]}", 'generated', letters[1], ''),
+                letters_dict[letters[1]]['max'], letters[1])
+    _copy_files(os.path.join(config.DATA_PATH, letters[1], ''),
+                os.path.join(config.PATH_CLASS_GAN_HALF, f"{letters[0]}_{letters[1]}", 'generated', letters[1], ''),
+                letters_dict[letters[1]]['half'], letters[1])
+    _copy_files(os.path.join(config.DATA_PATH, letters[1], ''),
+                os.path.join(config.PATH_CLASS_GAN_TEN_P, f"{letters[0]}_{letters[1]}", 'generated', letters[1], ''),
+                letters_dict[letters[1]]['ten_p'], letters[1])
 
 
 def train_validation_dividing(source_path, destination_path, files, letter, percentage):
