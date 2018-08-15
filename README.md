@@ -45,9 +45,10 @@ WHAT WE NEED
 	1. Metody balansowania próby (d)
 		- Tomek
 	2. GAN (d)
-		- Karolina
-	3. Klasyfikatory (d)
 		- Tomek
+	3. Klasyfikatory (d)
+		- Karolina
+		- Napisac cos o kolejnosci przyjmowania do train generatora obrazkow - czy to ma znaczenie
 	4. Opowieść o danych i opowieść o programie (m)
 		- ?
 		- Pokazać przykłady "prawilnych" literek oraz pokazać to, że zamiast liter pojawiają się np znaczki (rower/zwierzę itd)
