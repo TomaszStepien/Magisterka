@@ -1,5 +1,6 @@
 from __future__ import print_function, division
 
+import csv
 import datetime
 
 import matplotlib.pyplot as plt
@@ -11,7 +12,6 @@ from keras.layers.convolutional import UpSampling2D, Conv2D
 from keras.models import Sequential, Model
 from keras.optimizers import Adam
 
-import PROCES_FLOW.preparation as prep
 import config
 
 
@@ -109,8 +109,8 @@ class DCGAN():
     def train(self, X_train, epochs, batch_size=128, save_interval=50):
         start_time = datetime.datetime.now()
         folder_name = "DCGAN_" + start_time.strftime("%Y_%m_%d__%H_%M") + "/"
-        images_path = prep.create_folder([config.SAVED_FILES_PATH, "images", folder_name])
-        models_path = prep.create_folder([config.SAVED_FILES_PATH, "models", folder_name])
+        images_path = config.SAVED_IMAGES
+        models_path = config.SAVED_MODELS
 
         # X_train = X_train / 127.5 - 1.
         # X_train = np.expand_dims(X_train, axis=3)
@@ -149,6 +149,9 @@ class DCGAN():
             computation_time = str(datetime.datetime.now() - start_time)
             print("%d [D loss: %f, acc.: %.2f%%] [G loss: %f] exec.time: %s" % (
                 epoch, d_loss[0], 100 * d_loss[1], g_loss, computation_time))
+            with open('stats_file.csv', 'a', newline='') as outfile:
+                writer = csv.writer(outfile)
+                writer.writerow([epoch, d_loss[0], 100 * d_loss[1], g_loss, computation_time])
 
             # If at save interval => save generated image samples
             if epoch % save_interval == 0:

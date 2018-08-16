@@ -29,16 +29,16 @@ def load_images_into_array(path, pic_size=config.PIC_SIZE, sample_size=-1):
     temp_list = []
     for file in files:
         try:
-            img = img_to_array(load_img(f"{path}//{file}", target_size=pic_size)) / 127.5 - 1.
+            img = img_to_array(load_img(f"{path}/{file}", target_size=pic_size)) / 127.5 - 1.
             temp_list.append(img)
         except:
-            print(f"problem with: {path}\\{file}")
+            print(f"problem with: {path}/{file}")
             pass
 
     return np.stack(temp_list, axis=0)
 
 
-def load_sets(path=config.PATH,
+def load_sets(path=config.DATA_PATH,
               pic_size=config.PIC_SIZE,
               sample_size=(-1, -1),
               classes_to_read=config.CLASSES_TO_READ):
@@ -57,8 +57,8 @@ def load_sets(path=config.PATH,
     :return: tuple of ndarrays (x_train, y_train, x_valid, y_valid), shuffled
     """
 
-    if path[-1] != '\\':
-        path = path + '\\'
+    if path[-1] != '/':
+        path = path + '/'
 
     x_train = []
     x_valid = []
@@ -68,7 +68,7 @@ def load_sets(path=config.PATH,
 
     for c in classes_to_read:
         # loaded = load_images_into_array(path=f"{path}train\\{c}", pic_size=pic_size, sample_size=sample_size[0])
-        [os.rename(f"{path}{c}\\{f}", f"{path}{c}\\" + f.replace('=', '')) for f in os.listdir(f"{path}{c}")]
+        [os.rename(f"{path}{c}/{f}", f"{path}{c}/" + f.replace('=', '')) for f in os.listdir(f"{path}{c}")]
         loaded = load_images_into_array(path=f"{path}{c}", pic_size=pic_size, sample_size=sample_size[0])
         x_train.append(loaded)
         y_train += [label] * loaded.shape[0]
@@ -104,7 +104,7 @@ def prepare_dataset(x, y, classes_to_read):
     return x_dataset, y_dataset
 
 
-def load_all_pictures(path=config.PATH,
+def load_all_pictures(path=config.DATA_PATH,
                       pic_size=config.PIC_SIZE,
                       sample_size=(-1, -1),
                       classes_to_read=config.CLASSES_TO_READ):
@@ -117,10 +117,10 @@ def load_all_pictures(path=config.PATH,
     :param classes_to_read:
     :return: ndarray (npictures, width, height, RGB)
     """
-    if path[-1] != '\\':
-        path = path + '\\'
+    if path[-1] != '/':
+        path = path + '/'
 
-    images = [load_images_into_array(path=f"{path}{v}\\{c}", pic_size=pic_size, sample_size=sample_size[0]) for c in
+    images = [load_images_into_array(path=f"{path}{v}/{c}", pic_size=pic_size, sample_size=sample_size[0]) for c in
               classes_to_read for v in ('train', 'valid')]
     images = np.concatenate(images, axis=0)
 
