@@ -7,9 +7,9 @@ import os
 import sys
 
 # setup flags
-FLAG_PREPARE_DATASETS = True
-FLAG_TRAIN_GAN = True
-FLAG_GENERATE_IMAGES = True
+FLAG_PREPARE_DATASETS = False
+FLAG_TRAIN_GAN = False
+FLAG_GENERATE_IMAGES = False
 FLAG_CLASSIFY = True
 
 

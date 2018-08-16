@@ -101,14 +101,12 @@ if __name__ == "__main__":
                         generate_images(option, dcgan)
                         processing.end_process(processing_time, 'generating images')
 
-    for index, option in enumerate(config.DATASETS_OPTIONS):
-        option = [int(option[0]), int(option[1])]
-        for letters in config.LETTERS:
-            if config.FLAG_CLASSIFY:
-                processing_time = processing.start_process('classifying images')
-                option_folders = os.listdir(config.PATH_CLASS_LETTERS)
-                for option in option_folders:
-                    to_classify = os.listdir(os.path.join(config.PATH_CLASS_LETTERS, option))
-                    for folder in to_classify:
-                        classify_images(config.PATH_CLASS_LETTERS, option, folder)
-                    processing.end_process(processing_time, 'classifying images')
+    for letters in config.LETTERS:
+        if config.FLAG_CLASSIFY:
+            processing_time = processing.start_process('classifying images')
+            option_folders = os.listdir(config.PATH_CLASS_LETTERS)
+            for option in option_folders:
+                to_classify = os.listdir(os.path.join(config.PATH_CLASS_LETTERS, option))
+                for folder in to_classify:
+                    classify_images(config.PATH_CLASS_LETTERS, option, folder)
+                processing.end_process(processing_time, 'classifying images')
