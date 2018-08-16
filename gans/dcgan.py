@@ -4,6 +4,7 @@ import csv
 import datetime
 
 import matplotlib.pyplot as plt
+import matplotlib
 import numpy as np
 from keras.layers import BatchNormalization, Activation, ZeroPadding2D
 from keras.layers import Input, Dense, Reshape, Flatten, Dropout
@@ -11,7 +12,7 @@ from keras.layers.advanced_activations import LeakyReLU
 from keras.layers.convolutional import UpSampling2D, Conv2D
 from keras.models import Sequential, Model
 from keras.optimizers import Adam
-
+from PIL import Image
 import config
 
 
@@ -106,9 +107,8 @@ class DCGAN():
 
         return Model(img, validity)
 
-    def train(self, X_train, epochs, batch_size=128, save_interval=50):
+    def train(self, X_train, epochs, batch_size=128, save_interval=50, stats_path='gan_output.csv'):
         start_time = datetime.datetime.now()
-        folder_name = "DCGAN_" + start_time.strftime("%Y_%m_%d__%H_%M") + "/"
         images_path = config.SAVED_IMAGES
         models_path = config.SAVED_MODELS
 
@@ -149,33 +149,47 @@ class DCGAN():
             computation_time = str(datetime.datetime.now() - start_time)
             print("%d [D loss: %f, acc.: %.2f%%] [G loss: %f] exec.time: %s" % (
                 epoch, d_loss[0], 100 * d_loss[1], g_loss, computation_time))
-            with open('stats_file.csv', 'a', newline='') as outfile:
+            with open(stats_path, 'a', newline='') as outfile:
                 writer = csv.writer(outfile)
                 writer.writerow([epoch, d_loss[0], 100 * d_loss[1], g_loss, computation_time])
 
             # If at save interval => save generated image samples
             if epoch % save_interval == 0:
-                self.save_imgs(epoch, path=images_path)
+                self.save_imgs(path=images_path, epoch=epoch)
                 self.save_model(path=models_path)
 
-    def save_imgs(self, epoch, path):
-        r, c = 5, 5
-        noise = np.random.normal(0, 1, (r * c, self.latent_dim))
-        gen_imgs = self.generator.predict(noise)
-
-        # Rescale images 0 - 1
-        gen_imgs = 0.5 * gen_imgs + 0.5
-
-        fig, axs = plt.subplots(r, c)
-        fig, axs = plt.subplots(r, c)
-        cnt = 0
-        for i in range(r):
-            for j in range(c):
-                axs[i, j].imshow(gen_imgs[cnt, :, :, 0], cmap='gray')
-                axs[i, j].axis('off')
-                cnt += 1
-        fig.savefig(f"{path}/{epoch}.png")
-        plt.close()
+    def save_imgs(self, path, epoch='epoch', full=False, amount=100, r=5, c=5):
+        """
+        Function for generating set of images from pretrained model or
+        to control photo during training (r x c array of images)
+        :param path: Path where image(s) should be save
+        :param epoch: Number of epoch (while generating control photo during training)
+        :param full: boolean variable - it True then generate photos if False then generate control photo
+        :param amount: How many images should be generated (while generating set of images)
+        :param r: number of rows in control photo
+        :param c: number of columns in control photo
+        :return: saved image
+        """
+        if full:
+            noise = np.random.normal(0, 1, (amount, self.latent_dim))
+            gen_imgs = self.generator.predict(noise)
+            for i in range(amount):
+                matplotlib.image.imsave(f"{path}/GAN_{i}.png", gen_imgs[i, :, :, 0], cmap='gray')
+                print(f"SAVED: GAN_{i}.png")
+        else:
+            noise = np.random.normal(0, 1, (r * c, self.latent_dim))
+            gen_imgs = self.generator.predict(noise)
+            # Rescale images 0 - 1
+            gen_imgs = 0.5 * gen_imgs + 0.5
+            fig, axs = plt.subplots(r, c)
+            cnt = 0
+            for i in range(r):
+                for j in range(c):
+                    axs[i, j].imshow(gen_imgs[cnt, :, :, 0], cmap='gray')
+                    axs[i, j].axis('off')
+                    cnt += 1
+            fig.savefig(f"{path}/{epoch}.png")
+            plt.close()
 
     def save_model(self, path):
 
