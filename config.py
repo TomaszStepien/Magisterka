@@ -40,6 +40,7 @@ PATH_FINAL_DATA = os.path.join(home, 'MASTER_DATA')
 PATH_ROOT = os.path.join(PATH_FINAL_DATA, 'root')
 PATH_STATS = os.path.join(PATH_FINAL_DATA, 'stats_class')
 PATH_STATS_GAN = os.path.join(PATH_FINAL_DATA, 'stats_gan')
+PATH_MODELS_CLASS = os.path.join(PATH_FINAL_DATA, 'models_class')
 PATH_GAN_LETTERS = os.path.join(PATH_ROOT, 'GAN')
 PATH_CLASS_LETTERS = os.path.join(PATH_ROOT, 'CLASS')
 
