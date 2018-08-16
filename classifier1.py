@@ -23,9 +23,10 @@ def train_classifier(home_path, option, folder, img_width, img_height, nb_train_
         input_shape = (3, img_width, img_height)
     else:
         input_shape = (img_width, img_height, 3)
+    path_csv = os.path.join(config.PATH_STATS, f"{option}_{folder}_class_output.csv")
+    path_model = os.path.join(config.PATH_MODELS_CLASS, f"{option}_{folder}_model.h5")
 
-    csv_logger = CSVLogger(os.path.join(config.PATH_STATS, f"{option}_{folder}_class_output.csv"), append=True,
-                           separator=';')
+    csv_logger = CSVLogger(path_csv, append=True, separator=';')
     train_data_dir = os.path.join(home_path, 'train', '')
     validation_data_dir = os.path.join(home_path, 'validation', '')
     nb_train_samples = nb_train_samples
@@ -57,6 +58,7 @@ def train_classifier(home_path, option, folder, img_width, img_height, nb_train_
                                   verbose=False)
 
     _save_plots(history, os.path.join(config.PATH_STATS), option, folder)
+    model.save(path_model)
 
 
 def _create_model(input_shape):
