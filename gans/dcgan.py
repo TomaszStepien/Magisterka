@@ -1,10 +1,14 @@
+# coding=utf-8
+
+"""dcgan defined here"""
+
 from __future__ import print_function, division
 
 import csv
 import datetime
 
+import matplotlib.image
 import matplotlib.pyplot as plt
-import matplotlib
 import numpy as np
 from keras.layers import BatchNormalization, Activation, ZeroPadding2D
 from keras.layers import Input, Dense, Reshape, Flatten, Dropout
@@ -12,12 +16,16 @@ from keras.layers.advanced_activations import LeakyReLU
 from keras.layers.convolutional import UpSampling2D, Conv2D
 from keras.models import Sequential, Model
 from keras.optimizers import Adam
-from PIL import Image
+
 import config
 
 
-class DCGAN():
-    def __init__(self, pic_size=config.PIC_SIZE, channels=config.CHANNELS, num_classes=config.NUM_CLASSES):
+class DCGAN:
+    """
+    dcgan class
+    """
+
+    def __init__(self, pic_size=config.PIC_SIZE, channels=config.CHANNELS):
         if (pic_size[0] % 4) != 0 or (pic_size[1] % 4) != 0:
             raise ValueError('Picture size must be number possible to divide by 4!')
 
@@ -36,7 +44,7 @@ class DCGAN():
                                    metrics=['accuracy'])
 
         # Build the generator
-        self.generator = self.build_generator(pic_size)
+        self.generator = self.build_generator()
 
         # The generator takes noise as input and generates imgs
         z = Input(shape=(100,))
@@ -53,8 +61,11 @@ class DCGAN():
         self.combined = Model(z, valid)
         self.combined.compile(loss='binary_crossentropy', optimizer=optimizer)
 
-    def build_generator(self, pic_size=config.PIC_SIZE):
+    def build_generator(self):
+        """
 
+        :return: 
+        """
         model = Sequential()
 
         model.add(Dense(128 * 7 * 7, activation="relu", input_dim=self.latent_dim))
@@ -78,7 +89,10 @@ class DCGAN():
         return Model(noise, img)
 
     def build_discriminator(self):
+        """
 
+        :return: 
+        """
         model = Sequential()
 
         model.add(Conv2D(32, kernel_size=3, strides=2, input_shape=self.img_shape, padding="same"))
@@ -107,13 +121,21 @@ class DCGAN():
 
         return Model(img, validity)
 
-    def train(self, X_train, epochs, batch_size=128, save_interval=50, stats_path='gan_output.csv'):
+    def train(self, x_train, epochs, batch_size=128, save_interval=50, stats_path='gan_output.csv'):
+        """
+
+        :param x_train:
+        :param epochs:
+        :param batch_size:
+        :param save_interval:
+        :param stats_path:
+        """
         start_time = datetime.datetime.now()
         images_path = config.SAVED_IMAGES
         models_path = config.SAVED_MODELS
 
-        # X_train = X_train / 127.5 - 1.
-        # X_train = np.expand_dims(X_train, axis=3)
+        # x_train = x_train / 127.5 - 1.
+        # x_train = np.expand_dims(x_train, axis=3)
 
         # Adversarial ground truths
         valid = np.ones((batch_size, 1))
@@ -126,8 +148,8 @@ class DCGAN():
             # ---------------------
 
             # Select a random half of images
-            idx = np.random.randint(0, X_train.shape[0], batch_size)
-            imgs = X_train[idx]
+            idx = np.random.randint(0, x_train.shape[0], batch_size)
+            imgs = x_train[idx]
 
             # Sample noise and generate a batch of new images
             noise = np.random.normal(0, 1, (batch_size, self.latent_dim))
@@ -158,7 +180,7 @@ class DCGAN():
                 self.save_imgs(path=images_path, epoch=epoch)
                 self.save_model(path=models_path)
 
-    def save_imgs(self, path, epoch='epoch', full=False, amount=100, r=5, c=5):
+    def save_imgs(self, path, epoch=1, full=False, amount=100, r=5, c=5):
         """
         Function for generating set of images from pretrained model or
         to control photo during training (r x c array of images)
@@ -174,7 +196,7 @@ class DCGAN():
             noise = np.random.normal(0, 1, (amount, self.latent_dim))
             gen_imgs = self.generator.predict(noise)
             for i in range(amount):
-                matplotlib.image.imsave(f"{path}/GAN_{i}.png", gen_imgs[i, :, :, 0], cmap='gray')
+                matplotlib.image.imsave(f"{path}/GAN_{i}.png", gen_imgs[i, :, :, 0])
                 print(f"SAVED: GAN_{i}.png")
         else:
             noise = np.random.normal(0, 1, (r * c, self.latent_dim))
@@ -191,21 +213,26 @@ class DCGAN():
             fig.savefig(f"{path}/{epoch}.png")
             plt.close()
 
+    @staticmethod
+    def save(model, path, model_name):
+        """
+
+        :param model:
+        :param path:
+        :param model_name:
+        """
+        model_path = f"{path}/{model_name}.json"
+        weights_path = f"{path}/{model_name}_weights.hdf5"
+        options = {"file_arch": model_path,
+                   "file_weight": weights_path}
+        json_string = model.to_json()
+        open(options['file_arch'], 'w').write(json_string)
+        model.save_weights(options['file_weight'])
+
     def save_model(self, path):
+        """
 
-        def save(model, path, model_name):
-            model_path = f"{path}/{model_name}.json"
-            weights_path = f"{path}/{model_name}_weights.hdf5"
-            options = {"file_arch": model_path,
-                       "file_weight": weights_path}
-            json_string = model.to_json()
-            open(options['file_arch'], 'w').write(json_string)
-            model.save_weights(options['file_weight'])
-
-        save(self.generator, path, "dcgan_generator")
-        save(self.discriminator, path, "dcgan_discriminator")
-
-
-if __name__ == '__main__':
-    dcgan = DCGAN()
-    dcgan.train(epochs=4000, batch_size=32, save_interval=50)
+        :param path:
+        """
+        self.save(self.generator, path, "dcgan_generator")
+        self.save(self.discriminator, path, "dcgan_discriminator")

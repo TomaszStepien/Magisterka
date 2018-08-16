@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """contains default values for parameters,
 also creates repository structure
 # https://www.kaggle.com/volperosso/simple-cnn-classifier-on-notmnist/data
@@ -12,7 +14,6 @@ FLAG_TRAIN_GAN = False
 FLAG_GENERATE_IMAGES = False
 FLAG_CLASSIFY = True
 
-
 # create folder structure
 if sys.platform.startswith('linux'):
     home = "/home/tomasz/magisterka_data/"
@@ -20,7 +21,7 @@ else:
     home = "C:/magisterka_data/"
 
 DATA_PATH = home + "notMNIST_small"
-DATA_PATH = home + 'notMNIST_large'
+# DATA_PATH = home + 'notMNIST_large'
 
 SAVED_FILES = home + 'saved_files/'
 SAVED_IMAGES = home + 'saved_files/saved_images/'
@@ -34,7 +35,7 @@ DATASET_MAX = 1000
 DATASETS_LIST = [f"{str(DATASET_MAX)}_{str(DATASET_MAX)}",
                  f"{str(DATASET_MAX)}_{str(int(DATASET_MAX/2))}",
                  f"{str(DATASET_MAX)}_{str(int(DATASET_MAX*0.1))}"]
-DATASETS_OPTIONS = [[DATASET_MAX, DATASET_MAX], [DATASET_MAX, DATASET_MAX/2], [DATASET_MAX, DATASET_MAX*0.1]]
+DATASETS_OPTIONS = [[DATASET_MAX, DATASET_MAX], [DATASET_MAX, DATASET_MAX / 2], [DATASET_MAX, DATASET_MAX * 0.1]]
 
 PATH_FINAL_DATA = os.path.join(home, 'MASTER_DATA')
 PATH_ROOT = os.path.join(PATH_FINAL_DATA, 'root')
@@ -64,6 +65,10 @@ PATH_GAN_MAX_HALF_TEN = [PATH_GAN_MAX, PATH_GAN_HALF, PATH_GAN_TEN_P]
 
 
 def create_subfolder(directory):
+    """
+
+    :param directory:
+    """
     if not os.path.exists(directory):
         os.mkdir(directory)
         print(directory + ' created')
@@ -77,7 +82,6 @@ PIC_SIZE = (28, 28)  # only odd numbers
 CHANNELS = 3
 NUM_CLASSES = 1
 CLASSES_TO_READ = ('B', 'D')
-
 
 # gan model parameters
 EPOCHS_GAN = 10000  # todo

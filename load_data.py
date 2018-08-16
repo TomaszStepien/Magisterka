@@ -1,7 +1,6 @@
-"""loads images to np.arrays
+# coding=utf-8
 
-todo: try https://keras.io/preprocessing/image/
-"""
+"""loads images to np.arrays"""
 
 import os
 import random
@@ -34,10 +33,11 @@ def load_images_into_array(path, pic_size=config.PIC_SIZE, sample_size=-1):
         files = files[0:sample_size]
     temp_list = []
     for file in files:
+        # noinspection PyBroadException
         try:
             img = img_to_array(load_img(f"{path}/{file}", target_size=pic_size)) / 127.5 - 1.
             temp_list.append(img)
-        except:
+        except Exception:
             print(f"problem with: {path}/{file}")
             pass
 
@@ -64,7 +64,7 @@ def load_sets(path=config.DATA_PATH,
     """
 
     if path[-1] != '/':
-        path = path + '/'
+        path += '/'
 
     x_train = []
     x_valid = []
@@ -124,7 +124,7 @@ def load_all_pictures(path=config.DATA_PATH,
     :return: ndarray (npictures, width, height, RGB)
     """
     if path[-1] != '/':
-        path = path + '/'
+        path += '/'
 
     images = [load_images_into_array(path=f"{path}{v}/{c}", pic_size=pic_size, sample_size=sample_size[0]) for c in
               classes_to_read for v in ('train', 'valid')]
@@ -183,7 +183,7 @@ def prepare_final_datasets(letters):
             _prepare_folder(path + letter)
 
     letters_dict = defaultdict(dict)
-    first = True
+
     for letter in letters:
         # PREPARE LIST OF FILES
         letters_all = processing.return_all_files(os.path.join(config.DATA_PATH, letter))
@@ -247,6 +247,14 @@ def prepare_final_datasets(letters):
 
 
 def train_validation_dividing(source_path, destination_path, files, letter, percentage):
+    """
+
+    :param source_path:
+    :param destination_path:
+    :param files:
+    :param letter:
+    :param percentage:
+    """
     if len(files) == 0:
         files = [f for f in listdir(source_path) if isfile(join(source_path, f))]
     sample = random.sample(files, int(len(files) * percentage))
@@ -262,6 +270,14 @@ def train_validation_dividing(source_path, destination_path, files, letter, perc
 
 
 def _copy_files(source_folder, destination_folder, files, letter):
+    """
+
+    :param source_folder:
+    :param destination_folder:
+    :param files:
+    :param letter:
+    :return:
+    """
     for image in files:
         shutil.copyfile(source_folder + image, destination_folder + image)
     print(f"{str(len(files))} letters for {letter} copied")
@@ -272,10 +288,12 @@ def _remove_trash(path):
     Remove directory with files
     :param path: path to the directory
     """
+
+    # noinspection PyBroadException
     try:
         shutil.rmtree(path)
         print(f"{path} folder deleted")
-    except:
+    except Exception:
         print(f"Nothing to delete ({path})")
 
 
@@ -284,32 +302,9 @@ def _prepare_folder(path):
     Make directory
     :param path: path to the directory
     """
+
+    # noinspection PyBroadException
     try:
         os.mkdir(path)
-    except:
+    except Exception:
         print(f"{path} directory already exists")
-
-# test cases ====================================================================================
-# a, b, c, d = load_sets(defaults.PATH, defaults.PIC_SIZE, sample_size=(-1, -1),
-#                        classes_to_read=('dogs', 'cats'))
-#
-# print(a.shape == (23000, 20, 20, 3))
-# print(b.shape == (23000, 2))
-# print(c.shape == (2000, 20, 20, 3))
-# print(d.shape == (2000, 2))
-#
-# a, b, c, d = load_sets(defaults.PATH, defaults.PIC_SIZE, sample_size=(-1, -1),
-#                        classes_to_read=['dogs'])
-#
-# print(a.shape == (11500, 20, 20, 3))
-# print(b.shape == (11500, 1))
-# print(c.shape == (1000, 20, 20, 3))
-# print(d.shape == (1000, 1))
-#
-# a, b, c, d = load_sets(defaults.PATH, defaults.PIC_SIZE, sample_size=(1000, 1000),
-#                        classes_to_read=('dogs', 'cats'))
-#
-# print(a.shape == (2000, 20, 20, 3))
-# print(b.shape == (2000, 2))
-# print(c.shape == (2000, 20, 20, 3))
-# print(d.shape == (2000, 2))
