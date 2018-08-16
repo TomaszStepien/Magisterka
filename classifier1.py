@@ -1,13 +1,14 @@
-import matplotlib.pyplot as plt
-
-from keras.preprocessing.image import ImageDataGenerator
-from keras.models import Sequential
-from keras.layers import Conv2D, MaxPooling2D
-from keras.layers import Activation, Dropout, Flatten, Dense
-from keras import backend as K
 import os
-from keras.callbacks import CSVLogger
+
+import matplotlib.pyplot as plt
 import tensorflow as tf
+from keras import backend as K
+from keras.callbacks import CSVLogger
+from keras.layers import Activation, Dropout, Flatten, Dense
+from keras.layers import Conv2D, MaxPooling2D
+from keras.models import Sequential
+from keras.preprocessing.image import ImageDataGenerator
+
 import config
 
 
@@ -52,7 +53,8 @@ def train_classifier(home_path, option, folder, img_width, img_height, nb_train_
                                   epochs=epochs,
                                   validation_data=validation_generator,
                                   validation_steps=nb_validation_samples // batch_size,
-                                  callbacks=[csv_logger])
+                                  callbacks=[csv_logger],
+                                  verbose=False)
 
     _save_plots(history, os.path.join(config.PATH_STATS), option, folder)
 
@@ -90,6 +92,7 @@ def _save_plots(history, path, option, folder):
     plt.ylabel('Loss', fontsize=16)
     plt.title('Loss Curves', fontsize=16)
     plt.savefig(os.path.join(path, f"{option}_{folder}_loss.png"))
+    plt.close()
 
     plt.figure(figsize=[8, 6])
     plt.plot(history.history['acc'], 'r', linewidth=3.0)
@@ -99,3 +102,4 @@ def _save_plots(history, path, option, folder):
     plt.ylabel('Accuracy', fontsize=16)
     plt.title('Accuracy Curves', fontsize=16)
     plt.savefig(os.path.join(path, f"{option}_{folder}_accuracy.png"))
+    plt.close()
