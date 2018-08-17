@@ -63,31 +63,6 @@ def _prepare_dataset(x, y, classes_to_read):
     return x_dataset, y_dataset
 
 
-def _remove_trash(path):
-    """
-    Remove directory with files
-    :param path: path to the directory
-    """
-
-    try:
-        shutil.rmtree(path)
-        print(f"{path} folder deleted")
-    except FileNotFoundError:
-        print(f"Nothing to delete ({path})")
-
-
-def _prepare_folder(path):
-    """
-    Make directory
-    :param path: path to the directory
-    """
-
-    try:
-        os.mkdir(path)
-    except FileExistsError:
-        print(f"{path} directory already exists")
-
-
 def _prepare_classification_folders(folders_list, letters, gan=False):
     """
 
@@ -118,24 +93,10 @@ def _prepare_classification_folders(folders_list, letters, gan=False):
                 _prepare_folder(os.path.join(current_path, 'generated', letter))
 
 
-def _copy_files(source_folder, destination_folder, files, letter):
-    """
-
-    :param source_folder:
-    :param destination_folder:
-    :param files:
-    :param letter:
-    :return:
-    """
-    for image in files:
-        shutil.copyfile(source_folder + image, destination_folder + image)
-    print(f"{str(len(files))} letters for {letter} copied")
-
-
-def load_sets(path=config.DATA_PATH,
+def load_sets(classes_to_read,
+              path=config.DATA_PATH,
               pic_size=config.PIC_SIZE,
-              sample_size=(-1, -1),
-              classes_to_read=config.CLASSES_TO_READ):
+              sample_size=(-1, -1)):
     """reads train and valid pictures into keras friendly arrays
     assumes that each class has a sepearate directory with a proper name
     eg.
@@ -169,29 +130,6 @@ def load_sets(path=config.DATA_PATH,
     x_train, y_train = _prepare_dataset(x=x_train, y=y_train, classes_to_read=classes_to_read)
 
     return x_train, y_train, x_valid, y_valid
-
-
-def train_validation_dividing(source_path, destination_path, files, letter, percentage):
-    """
-
-    :param source_path:
-    :param destination_path:
-    :param files:
-    :param letter:
-    :param percentage:
-    """
-    if len(files) == 0:
-        files = [f for f in listdir(source_path) if isfile(join(source_path, f))]
-    sample = random.sample(files, int(len(files) * percentage))
-    train = [x for x in files if x in sample]
-    valid = [x for x in files if x not in sample]
-
-    _copy_files(os.path.join(source_path, ''),
-                os.path.join(destination_path, 'train', letter, ''),
-                train, letter)
-    _copy_files(os.path.join(source_path, ''),
-                os.path.join(destination_path, 'validation', letter, ''),
-                valid, letter)
 
 
 def prepare_final_datasets(letters):

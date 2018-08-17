@@ -27,7 +27,6 @@ SAVED_IMAGES = home + 'saved_files/saved_images/'
 SAVED_MODELS = home + 'saved_files/saved_models/'
 CLASS_DATA_PATH = home + 'notMNIST_training/'
 STATS_FILES = home + 'saved_files/stats_files/'
-IMAGE_PATH = os.path.join(home, 'notMNIST_large')
 
 LETTERS = [['A', 'D'], ['G', 'C'], ['I', 'J']]
 DATASET_MAX = 1000
@@ -80,10 +79,9 @@ for f in (SAVED_FILES, SAVED_IMAGES, SAVED_MODELS, CLASS_DATA_PATH, STATS_FILES)
 PIC_SIZE = (28, 28)  # only odd numbers
 CHANNELS = 3
 NUM_CLASSES = 1
-CLASSES_TO_READ = ('B', 'D')
 
 # gan model parameters
-EPOCHS_GAN = 10000  # todo
+EPOCHS_GAN = 10000
 EPOCHS_CLASS = 10
 BATCH_SIZE = 16
 SAMPLE_INTERVAL = 10
