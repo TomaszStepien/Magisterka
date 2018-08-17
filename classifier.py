@@ -33,7 +33,6 @@ def train_classifier(home_path, option, folder, img_width, img_height, nb_train_
     # (Ustawienia do CUDA)
     cf = tf.ConfigProto()
     cf.gpu_options.allow_growth = True
-    # session = tf.Session(config=cf)
 
     if K.image_data_format() == 'channels_first':
         input_shape = (3, img_width, img_height)
@@ -45,8 +44,7 @@ def train_classifier(home_path, option, folder, img_width, img_height, nb_train_
     csv_logger = CSVLogger(path_csv, append=True, separator=';')
     train_data_dir = os.path.join(home_path, 'train', '')
     validation_data_dir = os.path.join(home_path, 'validation', '')
-    nb_train_samples = nb_train_samples
-    nb_validation_samples = nb_validation_samples
+
     model = _create_model(input_shape)
     model.compile(loss='binary_crossentropy',
                   optimizer='rmsprop',

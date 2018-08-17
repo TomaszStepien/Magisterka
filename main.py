@@ -16,8 +16,8 @@ from src.tools import processing
 def train_gans(option):
     """
 
-    :param option: 
-    :return: 
+    :param option:
+    :return:
     """
     # Convert images to numpy arrays
     x_train, _, _, _ = dl.load_sets(path=config.PATH_GAN_LETTERS,
@@ -80,7 +80,6 @@ def classify_images(path, option, folder):
     print(f"Classification {option} {folder}")
     if len(os.listdir(os.path.join(home_path, 'train', folder.split('_')[0]))) == 0:
         print("FOLDER EMPTY!!")
-        pass
     else:
         samples = option.split('_')
         if len(samples) == 3:
