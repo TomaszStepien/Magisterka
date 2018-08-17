@@ -1,3 +1,6 @@
+# 16.08.2018
+![Przepływ procesu](https://github.com/TomaszStepien/Magisterka/blob/master/master%20thesis%20files/Przeplyw%20procesu.jpg?raw=true "Przepływ procesu")
+
 # 04.08.2018
 Kilka podejść do sprawdzenia w workflow:
 1. Jak klasyfikatory zachowują się przy zupełnie różnych od siebie literkach (A oraz D)

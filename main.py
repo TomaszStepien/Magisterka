@@ -58,13 +58,15 @@ def generate_images(option, dcgan):
                                  destination_path=os.path.join(config.PATH_CLASS_LETTERS,
                                                                f"{option[0]}_{option[1]}_GAN",
                                                                f"{letters[0]}_{letters[1]}"),
-                                 files=processing.return_all_files(path_first_letter), letter=letters[0],
+                                 files=processing.return_all_files(path_first_letter),
+                                 letter=letters[0],
                                  percentage=config.PROPORTION)
     dl.train_validation_dividing(source_path=path_second_letter,
                                  destination_path=os.path.join(config.PATH_CLASS_LETTERS,
                                                                f"{option[0]}_{option[1]}_GAN",
                                                                f"{letters[0]}_{letters[1]}"),
-                                 files=processing.return_all_files(path_second_letter), letter=letters[1],
+                                 files=processing.return_all_files(path_second_letter),
+                                 letter=letters[1],
                                  percentage=config.PROPORTION)
 
 

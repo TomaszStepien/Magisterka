@@ -9,19 +9,18 @@ import os
 import sys
 
 # setup flags
-FLAG_PREPARE_DATASETS = False
+FLAG_PREPARE_DATASETS = True
 FLAG_TRAIN_GAN = False
 FLAG_GENERATE_IMAGES = False
-FLAG_CLASSIFY = True
+FLAG_CLASSIFY = False
 
 # create folder structure
 if sys.platform.startswith('linux'):
     home = "/home/tomasz/magisterka_data/"
+    DATA_PATH = home + "notMNIST_small"
 else:
     home = "C:/magisterka_data/"
-
-DATA_PATH = home + "notMNIST_small"
-# DATA_PATH = home + 'notMNIST_large'
+    DATA_PATH = home + 'notMNIST_large'
 
 SAVED_FILES = home + 'saved_files/'
 SAVED_IMAGES = home + 'saved_files/saved_images/'
