@@ -1,28 +1,37 @@
+# coding=utf-8
+
+"""magisterka"""
+
 import os
 
 import tensorflow as tf
 
-import classifier1
+import classifier
 import config
 import gans.dcgan as dc_gan
 import load_data as dl
-import numpy as np
 from src.tools import processing
 
 
 def train_gans(option):
+    """
+
+    :param option: 
+    :return: 
+    """
     # Convert images to numpy arrays
-    X_train, _, _, _ = dl.load_sets(path=config.PATH_GAN_LETTERS,
+    x_train, _, _, _ = dl.load_sets(path=config.PATH_GAN_LETTERS,
                                     sample_size=(int(option[1]), 100),
                                     classes_to_read=[f"{option[1]}_{letters[1]}"])
     # CUDA settings
     c = tf.ConfigProto()
     c.gpu_options.allow_growth = True
-    session = tf.Session(config=c)
+    # session = tf.Session(config=c)
+
     # Train GAN
-    dcgan = dc_gan.DCGAN(pic_size=config.PIC_SIZE,channels=config.CHANNELS,
-                         num_classes=config.NUM_CLASSES)
-    dcgan.train(X_train=X_train,
+    dcgan = dc_gan.DCGAN(pic_size=config.PIC_SIZE,
+                         channels=config.CHANNELS)
+    dcgan.train(x_train=x_train,
                 epochs=config.EPOCHS_GAN,
                 batch_size=config.BATCH_SIZE,
                 save_interval=config.SAMPLE_INTERVAL,
@@ -31,6 +40,11 @@ def train_gans(option):
 
 
 def generate_images(option, dcgan):
+    """
+
+    :param option:
+    :param dcgan:
+    """
     path_first_letter = os.path.join(config.PATH_CLASS_LETTERS, f"{option[0]}_{option[1]}_GAN",
                                      f"{letters[0]}_{letters[1]}",
                                      'generated', letters[0])
@@ -44,17 +58,25 @@ def generate_images(option, dcgan):
                                  destination_path=os.path.join(config.PATH_CLASS_LETTERS,
                                                                f"{option[0]}_{option[1]}_GAN",
                                                                f"{letters[0]}_{letters[1]}"),
-                                 files=processing.return_all_files(path_first_letter), letter=letters[0],
+                                 files=processing.return_all_files(path_first_letter),
+                                 letter=letters[0],
                                  percentage=config.PROPORTION)
     dl.train_validation_dividing(source_path=path_second_letter,
                                  destination_path=os.path.join(config.PATH_CLASS_LETTERS,
                                                                f"{option[0]}_{option[1]}_GAN",
                                                                f"{letters[0]}_{letters[1]}"),
-                                 files=processing.return_all_files(path_second_letter), letter=letters[1],
+                                 files=processing.return_all_files(path_second_letter),
+                                 letter=letters[1],
                                  percentage=config.PROPORTION)
 
 
 def classify_images(path, option, folder):
+    """
+
+    :param path:
+    :param option:
+    :param folder:
+    """
     img_width, img_height = config.PIC_SIZE[0], config.PIC_SIZE[1]
     home_path = os.path.join(path, option, folder)
     print(f"Classification {option} {folder}")
@@ -73,8 +95,8 @@ def classify_images(path, option, folder):
 
         epochs = config.EPOCHS_CLASS
         batch_size = config.BATCH_SIZE
-        classifier1.train_classifier(home_path, option, folder, img_width, img_height, nb_train_samples,
-                                     nb_validation_samples, epochs, batch_size)
+        classifier.train_classifier(home_path, option, folder, img_width, img_height, nb_train_samples,
+                                    nb_validation_samples, epochs, batch_size)
 
 
 if __name__ == "__main__":
@@ -101,12 +123,11 @@ if __name__ == "__main__":
                         generate_images(option, dcgan)
                         processing.end_process(processing_time, 'generating images')
 
-    for letters in config.LETTERS:
-        if config.FLAG_CLASSIFY:
-            processing_time = processing.start_process('classifying images')
-            option_folders = os.listdir(config.PATH_CLASS_LETTERS)
-            for option in option_folders:
-                to_classify = os.listdir(os.path.join(config.PATH_CLASS_LETTERS, option))
-                for folder in to_classify:
-                    classify_images(config.PATH_CLASS_LETTERS, option, folder)
-                processing.end_process(processing_time, 'classifying images')
+    if config.FLAG_CLASSIFY:
+        processing_time = processing.start_process('classifying images')
+        option_folders = os.listdir(config.PATH_CLASS_LETTERS)
+        for option in option_folders:
+            to_classify = os.listdir(os.path.join(config.PATH_CLASS_LETTERS, option))
+            for folder in to_classify:
+                classify_images(config.PATH_CLASS_LETTERS, option, folder)
+            processing.end_process(processing_time, 'classifying images')
