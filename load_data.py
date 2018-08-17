@@ -18,7 +18,7 @@ import config
 from src.tools import processing
 
 
-def load_images_into_array(path, pic_size=config.PIC_SIZE, sample_size=-1):
+def _load_images_into_array(path, pic_size=config.PIC_SIZE, sample_size=-1):
     """iterates over a directory and reads all images
     into an ndarray with dimensions (nfiles, width, height, 3)
     assumes all files in the given directory are images
@@ -44,61 +44,14 @@ def load_images_into_array(path, pic_size=config.PIC_SIZE, sample_size=-1):
     return np.stack(temp_list, axis=0)
 
 
-def load_sets(path=config.DATA_PATH,
-              pic_size=config.PIC_SIZE,
-              sample_size=(-1, -1),
-              classes_to_read=config.CLASSES_TO_READ):
-    """reads train and valid pictures into keras friendly arrays
-    assumes that each class has a sepearate directory with a proper name
-    eg.
-    C://magisterka_data//dogscats//train//dogs
-    C://magisterka_data//dogscats//train//cats
-    C://magisterka_data//dogscats//valid//dogs
-    C://magisterka_data//dogscats//valid//cats
-
-    :param pic_size:
-    :param path:
-    :param classes_to_read: should match names of proper directories
-    :param sample_size: tuple -1 means all images
-    :return: tuple of ndarrays (x_train, y_train, x_valid, y_valid), shuffled
-    """
-
-    if path[-1] != '/':
-        path += '/'
-
-    x_train = []
-    x_valid = []
-    y_train = []
-    y_valid = []
-    label = 0
-
-    for c in classes_to_read:
-        # loaded = load_images_into_array(path=f"{path}train\\{c}", pic_size=pic_size, sample_size=sample_size[0])
-        [os.rename(f"{path}{c}/{f}", f"{path}{c}/" + f.replace('=', '')) for f in os.listdir(f"{path}{c}")]
-        loaded = load_images_into_array(path=f"{path}{c}", pic_size=pic_size, sample_size=sample_size[0])
-        x_train.append(loaded)
-        y_train += [label] * loaded.shape[0]
-
-        # loaded = load_images_into_array(path=f"{path}valid\\{c}", pic_size=pic_size, sample_size=sample_size[1])
-        # x_valid.append(loaded)
-        # y_valid += [label for i in range(loaded.shape[0])]
-
-        label += 1
-
-    x_train, y_train = prepare_dataset(x=x_train, y=y_train, classes_to_read=classes_to_read)
-    # x_valid, y_valid = prepare_dataset(x=x_valid, y=y_valid, classes_to_read=classes_to_read)
-
-    return x_train, y_train, x_valid, y_valid
-
-
-def prepare_dataset(x, y, classes_to_read):
+def _prepare_dataset(x, y, classes_to_read):
     """divides datasets for x and y
 
-        :param x:
-        :param y:
-        :param classes_to_read: number of classes
-        :return: ready x and y for given type of dataset
-        """
+    :param x:
+    :param y:
+    :param classes_to_read: number of classes
+    :return: ready x and y for given type of dataset
+    """
     x_dataset = np.concatenate(x, axis=0)
     y_dataset = np.array(y)
     shuffle_dataset = np.random.permutation(x_dataset.shape[0])
@@ -110,36 +63,38 @@ def prepare_dataset(x, y, classes_to_read):
     return x_dataset, y_dataset
 
 
-def load_all_pictures(path=config.DATA_PATH,
-                      pic_size=config.PIC_SIZE,
-                      sample_size=(-1, -1),
-                      classes_to_read=config.CLASSES_TO_READ):
+def _remove_trash(path):
     """
-    loads all pictures from a given directory to one 4d ndarray
-
-    :param path:
-    :param pic_size:
-    :param sample_size:
-    :param classes_to_read:
-    :return: ndarray (npictures, width, height, RGB)
+    Remove directory with files
+    :param path: path to the directory
     """
-    if path[-1] != '/':
-        path += '/'
 
-    images = [load_images_into_array(path=f"{path}{v}/{c}", pic_size=pic_size, sample_size=sample_size[0]) for c in
-              classes_to_read for v in ('train', 'valid')]
-    images = np.concatenate(images, axis=0)
-
-    return images
+    try:
+        shutil.rmtree(path)
+        print(f"{path} folder deleted")
+    except FileNotFoundError:
+        print(f"Nothing to delete ({path})")
 
 
-def augment_sets(x_train, y_train, x_valid, y_valid):
-    """work in progress"""
-    # todo: implement https://keras.io/preprocessing/image/
-    return x_train, y_train, x_valid, y_valid
+def _prepare_folder(path):
+    """
+    Make directory
+    :param path: path to the directory
+    """
+
+    try:
+        os.mkdir(path)
+    except FileExistsError:
+        print(f"{path} directory already exists")
 
 
 def _prepare_classification_folders(folders_list, letters, gan=False):
+    """
+
+    :param folders_list:
+    :param letters:
+    :param gan:
+    """
     for path in folders_list:
         current_path = os.path.join(path, f"{letters[0]}_{letters[1]}")
         _prepare_folder(path)
@@ -161,6 +116,82 @@ def _prepare_classification_folders(folders_list, letters, gan=False):
             if gan:
                 _remove_trash(os.path.join(current_path, 'generated', letter))
                 _prepare_folder(os.path.join(current_path, 'generated', letter))
+
+
+def _copy_files(source_folder, destination_folder, files, letter):
+    """
+
+    :param source_folder:
+    :param destination_folder:
+    :param files:
+    :param letter:
+    :return:
+    """
+    for image in files:
+        shutil.copyfile(source_folder + image, destination_folder + image)
+    print(f"{str(len(files))} letters for {letter} copied")
+
+
+def load_sets(path=config.DATA_PATH,
+              pic_size=config.PIC_SIZE,
+              sample_size=(-1, -1),
+              classes_to_read=config.CLASSES_TO_READ):
+    """reads train and valid pictures into keras friendly arrays
+    assumes that each class has a sepearate directory with a proper name
+    eg.
+    # todo: complete documentation
+
+    :param pic_size:
+    :param path:
+    :param classes_to_read: should match names of proper directories
+    :param sample_size: tuple -1 means all images
+    :return: tuple of ndarrays (x_train, y_train, x_valid, y_valid), shuffled
+    """
+
+    if path[-1] != '/':
+        path += '/'
+
+    x_train = []
+    x_valid = []
+    y_train = []
+    y_valid = []
+    label = 0
+
+    for c in classes_to_read:
+        for f in os.listdir(f"{path}{c}"):
+            os.rename(f"{path}{c}/{f}", f"{path}{c}/" + f.replace('=', ''))
+        loaded = _load_images_into_array(path=f"{path}{c}", pic_size=pic_size, sample_size=sample_size[0])
+        x_train.append(loaded)
+        y_train += [label] * loaded.shape[0]
+
+        label += 1
+
+    x_train, y_train = _prepare_dataset(x=x_train, y=y_train, classes_to_read=classes_to_read)
+
+    return x_train, y_train, x_valid, y_valid
+
+
+def train_validation_dividing(source_path, destination_path, files, letter, percentage):
+    """
+
+    :param source_path:
+    :param destination_path:
+    :param files:
+    :param letter:
+    :param percentage:
+    """
+    if len(files) == 0:
+        files = [f for f in listdir(source_path) if isfile(join(source_path, f))]
+    sample = random.sample(files, int(len(files) * percentage))
+    train = [x for x in files if x in sample]
+    valid = [x for x in files if x not in sample]
+
+    _copy_files(os.path.join(source_path, ''),
+                os.path.join(destination_path, 'train', letter, ''),
+                train, letter)
+    _copy_files(os.path.join(source_path, ''),
+                os.path.join(destination_path, 'validation', letter, ''),
+                valid, letter)
 
 
 def prepare_final_datasets(letters):
