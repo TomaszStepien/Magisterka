@@ -2,7 +2,7 @@
 
 """classifier"""
 
-import os
+from datetime import datetime
 
 import matplotlib.pyplot as plt
 import tensorflow as tf
@@ -13,65 +13,59 @@ from keras.layers import Conv2D, MaxPooling2D
 from keras.models import Sequential
 from keras.preprocessing.image import ImageDataGenerator
 
-import config
 
-
-def train_classifier(home_path, option, folder, img_width, img_height, nb_train_samples, nb_validation_samples, epochs,
-                     batch_size):
+def train_classifier(x_train, y_train, x_valid, y_valid, set_configuration, model_configuration):
     """
-
-    :param home_path:
-    :param option:
-    :param folder:
-    :param img_width:
-    :param img_height:
-    :param nb_train_samples:
-    :param nb_validation_samples:
-    :param epochs:
-    :param batch_size:
+    trains_classifier
     """
     # (Ustawienia do CUDA)
     cf = tf.ConfigProto()
     cf.gpu_options.allow_growth = True
 
     if K.image_data_format() == 'channels_first':
-        input_shape = (3, img_width, img_height)
+        input_shape = (3, x_train.shape[1], x_train.shape[2])
     else:
-        input_shape = (img_width, img_height, 3)
-    path_csv = os.path.join(config.PATH_STATS, f"{option}_{folder}_class_output.csv")
-    path_model = os.path.join(config.PATH_MODELS_CLASS, f"{option}_{folder}_model.h5")
+        input_shape = (x_train.shape[1], x_train.shape[2], 3)
+
+    letters = list(set_configuration.keys())
+    folder_name = f"{letters[0]}{set_configuration[letters[0]][0]}_" \
+                  f"{letters[1]}{set_configuration[letters[1]][0]}_" \
+                  f"{str(datetime.now())[:16].replace('-', '').replace(':', '').replace(' ', '_')}"
+
+    path_csv = f'saved_models/{folder_name}/csv_logs.csv'
+    path_model = f'saved_models/{folder_name}/model.h5'
 
     csv_logger = CSVLogger(path_csv, append=True, separator=';')
-    train_data_dir = os.path.join(home_path, 'train', '')
-    validation_data_dir = os.path.join(home_path, 'validation', '')
 
     model = _create_model(input_shape)
     model.compile(loss='binary_crossentropy',
                   optimizer='rmsprop',
                   metrics=['accuracy'])
+
     train_datagen = ImageDataGenerator(
-        rescale=1. / 255,
         shear_range=0.2,
         zoom_range=0.2,
         horizontal_flip=True)
-    test_datagen = ImageDataGenerator(rescale=1. / 255)
-    train_generator = train_datagen.flow_from_directory(train_data_dir,
-                                                        target_size=(img_width, img_height),
-                                                        batch_size=batch_size,
-                                                        class_mode='binary')
-    validation_generator = test_datagen.flow_from_directory(validation_data_dir,
-                                                            target_size=(img_width, img_height),
-                                                            batch_size=batch_size,
-                                                            class_mode='binary')
+
+    validation_datagen = ImageDataGenerator()
+
+    train_generator = train_datagen.flow(x=x_train,
+                                         y=y_train,
+                                         batch_size=model_configuration['batch_size'])
+
+    validation_generator = validation_datagen.flow(x=x_valid,
+                                                   y=y_valid,
+                                                   batch_size=model_configuration['batch_size'])
+
     history = model.fit_generator(train_generator,
-                                  steps_per_epoch=nb_train_samples // batch_size,
-                                  epochs=epochs,
+                                  batch_size=model_configuration['batch_size'],
+                                  epochs=model_configuration['epochs'],
                                   validation_data=validation_generator,
-                                  validation_steps=nb_validation_samples // batch_size,
+                                  validation_steps=x_train.shape[0] // model_configuration['batch_size'],
                                   callbacks=[csv_logger],
                                   verbose=False)
 
-    _save_plots(history, os.path.join(config.PATH_STATS), option, folder)
+    _save_plots(history, f'saved_models/{folder_name}/plots')
     model.save(path_model)
 
 
@@ -94,12 +88,12 @@ def _create_model(input_shape):
     model.add(Activation('relu'))
     model.add(Dropout(0.5))
     model.add(Dense(1))
-    model.add(Activation('sigmoid'))
+    model.add(Activation('softmax'))
 
     return model
 
 
-def _save_plots(history, path, option, folder):
+def _save_plots(history, directory):
     plt.figure(figsize=[8, 6])
     plt.plot(history.history['loss'], 'r', linewidth=3.0)
     plt.plot(history.history['val_loss'], 'b', linewidth=3.0)
@@ -107,7 +101,7 @@ def _save_plots(history, path, option, folder):
     plt.xlabel('Epochs ', fontsize=16)
     plt.ylabel('Loss', fontsize=16)
     plt.title('Loss Curves', fontsize=16)
-    plt.savefig(os.path.join(path, f"{option}_{folder}_loss.png"))
+    plt.savefig(f"{directory}/loss.png")
     plt.close()
 
     plt.figure(figsize=[8, 6])
@@ -117,5 +111,5 @@ def _save_plots(history, path, option, folder):
     plt.xlabel('Epochs ', fontsize=16)
     plt.ylabel('Accuracy', fontsize=16)
     plt.title('Accuracy Curves', fontsize=16)
-    plt.savefig(os.path.join(path, f"{option}_{folder}_accuracy.png"))
+    plt.savefig(f"{directory}/accuracy.png")
     plt.close()
