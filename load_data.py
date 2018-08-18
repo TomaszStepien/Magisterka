@@ -9,7 +9,7 @@ import numpy as np
 from keras.preprocessing.image import img_to_array, load_img
 
 
-def load_images_into_array(directory, pic_size=(10, 10), sample_size=-1):
+def load_images_into_array(directory, pic_size=(28, 28), sample_size=-1):
     """
 
     :param directory: directory containing pictures

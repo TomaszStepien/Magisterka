@@ -2,6 +2,7 @@
 
 """classifier"""
 
+import os
 from datetime import datetime
 
 import matplotlib.pyplot as plt
@@ -16,7 +17,7 @@ from keras.preprocessing.image import ImageDataGenerator
 
 def train_classifier(x_train, y_train, x_valid, y_valid, set_configuration, model_configuration):
     """
-    trains_classifier
+    trains_classifier and saves all the stuff to a folder
     """
     # (Ustawienia do CUDA)
     cf = tf.ConfigProto()
@@ -28,13 +29,9 @@ def train_classifier(x_train, y_train, x_valid, y_valid, set_configuration, mode
         input_shape = (x_train.shape[1], x_train.shape[2], 3)
 
     letters = list(set_configuration.keys())
-    folder_name = f"{letters[0]}{set_configuration[letters[0]][0]}_" \
-                  f"{letters[1]}{set_configuration[letters[1]][0]}_" \
-                  f"{str(datetime.now())[:16].replace('-', '').replace(':', '').replace(' ', '_')}"
+    folder_name = _create_model_folder(letters, (set_configuration[letters[0]][0], set_configuration[letters[1]][0]))
 
     path_csv = f'saved_models/{folder_name}/csv_logs.csv'
-    path_model = f'saved_models/{folder_name}/model.h5'
-
     csv_logger = CSVLogger(path_csv, append=True, separator=';')
 
     model = _create_model(input_shape)
@@ -58,14 +55,16 @@ def train_classifier(x_train, y_train, x_valid, y_valid, set_configuration, mode
                                                    batch_size=model_configuration['batch_size'])
 
     history = model.fit_generator(train_generator,
-                                  batch_size=model_configuration['batch_size'],
+                                  steps_per_epoch=x_train.shape[0] // model_configuration['batch_size'],
                                   epochs=model_configuration['epochs'],
                                   validation_data=validation_generator,
-                                  validation_steps=x_train.shape[0] // model_configuration['batch_size'],
+                                  validation_steps=x_valid.shape[0] // model_configuration['batch_size'],
                                   callbacks=[csv_logger],
-                                  verbose=False)
+                                  verbose=True)
 
-    _save_plots(history, f'saved_models/{folder_name}/plots')
+    _save_plots(history, f'saved_models/{folder_name}')
+
+    path_model = f'saved_models/{folder_name}/model.h5'
     model.save(path_model)
 
 
@@ -113,3 +112,15 @@ def _save_plots(history, directory):
     plt.title('Accuracy Curves', fontsize=16)
     plt.savefig(f"{directory}/accuracy.png")
     plt.close()
+
+
+def _create_model_folder(classes_names, classes_numbers):
+    if not os.path.isdir('saved_folders'):
+        os.mkdir('saved_folders')
+
+    model_folder = f"{classes_names[0]}{classes_numbers[0]}_" \
+                   f"{classes_names[1]}{classes_numbers[1]}_" \
+                   f"{str(datetime.now())[:16].replace('-', '').replace(':', '').replace(' ', '_')}"
+
+    os.mkdir(f'saved_models/{model_folder}')
+    return model_folder
