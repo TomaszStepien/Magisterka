@@ -4,7 +4,6 @@
 
 import os
 
-import matplotlib.pyplot as plt
 import tensorflow as tf
 from keras import backend as K
 from keras.callbacks import CSVLogger
@@ -14,6 +13,7 @@ from keras.models import Sequential
 from keras.preprocessing.image import ImageDataGenerator
 
 import config
+from classifier import classfication_plots
 
 
 def train_classifier(home_path, option, folder, img_width, img_height, nb_train_samples, nb_validation_samples, epochs,
@@ -71,7 +71,7 @@ def train_classifier(home_path, option, folder, img_width, img_height, nb_train_
                                   callbacks=[csv_logger],
                                   verbose=False)
 
-    _save_plots(history, os.path.join(config.PATH_STATS), option, folder)
+    classfication_plots.save_plots(history, os.path.join(config.PATH_STATS), option, folder)
     model.save(path_model)
 
 
@@ -97,25 +97,3 @@ def _create_model(input_shape):
     model.add(Activation('sigmoid'))
 
     return model
-
-
-def _save_plots(history, path, option, folder):
-    plt.figure(figsize=[8, 6])
-    plt.plot(history.history['loss'], 'r', linewidth=3.0)
-    plt.plot(history.history['val_loss'], 'b', linewidth=3.0)
-    plt.legend(['Training loss', 'Validation Loss'], fontsize=18)
-    plt.xlabel('Epochs ', fontsize=16)
-    plt.ylabel('Loss', fontsize=16)
-    plt.title('Loss Curves', fontsize=16)
-    plt.savefig(os.path.join(path, f"{option}_{folder}_loss.png"))
-    plt.close()
-
-    plt.figure(figsize=[8, 6])
-    plt.plot(history.history['acc'], 'r', linewidth=3.0)
-    plt.plot(history.history['val_acc'], 'b', linewidth=3.0)
-    plt.legend(['Training Accuracy', 'Validation Accuracy'], fontsize=18)
-    plt.xlabel('Epochs ', fontsize=16)
-    plt.ylabel('Accuracy', fontsize=16)
-    plt.title('Accuracy Curves', fontsize=16)
-    plt.savefig(os.path.join(path, f"{option}_{folder}_accuracy.png"))
-    plt.close()

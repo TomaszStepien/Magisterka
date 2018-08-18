@@ -12,7 +12,8 @@ import sys
 FLAG_PREPARE_DATASETS = True
 FLAG_TRAIN_GAN = False
 FLAG_GENERATE_IMAGES = False
-FLAG_CLASSIFY = False
+FLAG_CLASSIFY = True
+FLAG_TEST_CLASSIFICATION = True
 
 # create folder structure
 if sys.platform.startswith('linux'):
@@ -82,7 +83,7 @@ NUM_CLASSES = 1
 
 # gan model parameters
 EPOCHS_GAN = 10000
-EPOCHS_CLASS = 10
+EPOCHS_CLASS = 5
 BATCH_SIZE = 16
 SAMPLE_INTERVAL = 10
 PROPORTION = 0.7

@@ -6,10 +6,10 @@ import os
 
 import tensorflow as tf
 
-import classifier
 import config
 import gans.dcgan as dc_gan
 import load_data as dl
+from classifier import classifier
 from src.tools import processing
 
 
@@ -130,3 +130,7 @@ if __name__ == "__main__":
             for folder in to_classify:
                 classify_images(config.PATH_CLASS_LETTERS, option, folder)
             processing.end_process(processing_time, 'classifying images')
+
+    if config.FLAG_TEST_CLASSIFICATION:
+        processing_time = processing.start_process('testing classification')
+        processing.end_process(processing_time, 'testing classification')

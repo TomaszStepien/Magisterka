@@ -183,63 +183,65 @@ def prepare_final_datasets(letters):
 
     """ Split files into train, valid and test folder and copy it into these fold """
     split_to_train_valid(letters=letters,
-                         letters_dict=letters_dict,
-                         first_letter=0)
+                         letters_dict=letters_dict)
 
     # COPY FILES TO CLASS (+ GENERATED PHOTOS)
     copy_files_to_class_generated(letters=letters,
-                                  letters_dict=letters_dict,
-                                  first_letter=0)
-
-    split_to_train_valid(letters=letters,
-                         letters_dict=letters_dict,
-                         first_letter=1)
-
-    # COPY FILES TO CLASS (+ GENERATED PHOTOS)
-    copy_files_to_class_generated(letters=letters,
-                                  letters_dict=letters_dict,
-                                  first_letter=1)
+                                  letters_dict=letters_dict)
 
 
-def copy_files_to_class_generated(letters, letters_dict, first_letter):
+def copy_files_to_class_generated(letters, letters_dict):
     """
     Funtion for moving files into generated and test folders in loop depending on option
     ('max', 'half' and 'ten percent')
     :param letters: letters on which we are doing operations
     :param letters_dict: letters dictionary
-    :param first_letter: boolean value - tells if operation is on first or second letter from list
     :return:
     """
-    for option in ('max', 'half', 'ten_p'):
-        _copy_files(source_folder=os.path.join(config.DATA_PATH, letters[first_letter], ''),
-                    destination_folder=os.path.join(config.PATH_CLASS_GAN_MAX, f"{letters[0]}_{letters[1]}",
-                                                    'generated', letters[first_letter], ''),
-                    files=letters_dict[letters[first_letter]][option],
-                    letter=letters[1])
-    _copy_files(source_folder=os.path.join(config.DATA_PATH, letters[first_letter], ''),
-                destination_folder=os.path.join(config.PATH_CLASS_GAN_TEN_P, f"{letters[0]}_{letters[1]}",
-                                                'test', letters[first_letter], ''),
-                files=letters_dict[letters[first_letter]]['test'],
-                letter=letters[first_letter])
+    for first_letter in range(2):
+        if first_letter == 0:
+            option_path_list = [('max', config.PATH_CLASS_GAN_MAX), ('max', config.PATH_CLASS_GAN_HALF),
+                                ('max', config.PATH_CLASS_GAN_TEN_P)]
+        else:
+            option_path_list = [('max', config.PATH_CLASS_GAN_MAX), ('half', config.PATH_CLASS_GAN_HALF),
+                                ('ten_p', config.PATH_CLASS_GAN_TEN_P)]
+
+        for option, path in option_path_list:
+            _copy_files(source_folder=os.path.join(config.DATA_PATH, letters[first_letter], ''),
+                        destination_folder=os.path.join(path, f"{letters[0]}_{letters[1]}", 'generated',
+                                                        letters[first_letter], ''),
+                        files=letters_dict[letters[first_letter]][option],
+                        letter=letters[1])
+            _copy_files(source_folder=os.path.join(config.DATA_PATH, letters[first_letter], ''),
+                        destination_folder=os.path.join(path, f"{letters[0]}_{letters[1]}", 'test',
+                                                        letters[first_letter], ''),
+                        files=letters_dict[letters[first_letter]]['test'],
+                        letter=letters[first_letter])
 
 
-def split_to_train_valid(letters, letters_dict, first_letter):
+def split_to_train_valid(letters, letters_dict):
     """
     Funtion for splitting files into train, validation and test folders in loop depending on option
     ('max', 'half' and 'ten percent')
     :param letters: letters on which we are doing operations
     :param letters_dict: letters dictionary
-    :param first_letter: boolean value - tells if operation is on first or second letter from list
     :return:
     """
-    for option in ['max', 'half', 'ten_p']:
-        train_validation_test_dividing(source_path=config.PATH_GAN_MAX + letters[first_letter],
-                                       destination_path=os.path.join(config.PATH_CLASS_MAX,
-                                                                     f"{letters[0]}_{letters[1]}"),
-                                       files=letters_dict[letters[first_letter]][option],
-                                       test_files=letters_dict[letters[first_letter]]['test'],
-                                       letter=letters[first_letter],
-                                       percentage=config.PROPORTION)
+    for first_letter in range(2):
+        if first_letter == 0:
+            option_path_list = [('max', config.PATH_CLASS_MAX), ('max', config.PATH_CLASS_HALF),
+                                ('max', config.PATH_CLASS_TEN_P)]
+        else:
+            option_path_list = [('max', config.PATH_CLASS_MAX), ('half', config.PATH_CLASS_HALF),
+                                ('ten_p', config.PATH_CLASS_TEN_P)]
+
+        for option, path in option_path_list:
+            train_validation_test_dividing(source_path=config.PATH_GAN_MAX + letters[first_letter],
+                                           destination_path=os.path.join(path, f"{letters[0]}_{letters[1]}"),
+                                           files=letters_dict[letters[first_letter]][option],
+                                           test_files=letters_dict[letters[first_letter]]['test'],
+                                           letter=letters[first_letter],
+                                           percentage=config.PROPORTION)
 
 
 def train_validation_test_dividing(source_path, destination_path, files, test_files, letter, percentage):
