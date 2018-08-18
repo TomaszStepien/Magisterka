@@ -48,11 +48,13 @@ def train_classifier(x_train, y_train, x_valid, y_valid, set_configuration, mode
 
     train_generator = train_datagen.flow(x=x_train,
                                          y=y_train,
-                                         batch_size=model_configuration['batch_size'])
+                                         batch_size=model_configuration['batch_size'],
+                                         shuffle=True)
 
     validation_generator = validation_datagen.flow(x=x_valid,
                                                    y=y_valid,
-                                                   batch_size=model_configuration['batch_size'])
+                                                   batch_size=model_configuration['batch_size'],
+                                                   shuffle=True)
 
     history = model.fit_generator(train_generator,
                                   steps_per_epoch=x_train.shape[0] // model_configuration['batch_size'],
@@ -86,7 +88,7 @@ def _create_model(input_shape):
     model.add(Dense(64))
     model.add(Activation('relu'))
     model.add(Dropout(0.5))
-    model.add(Dense(1))
+    model.add(Dense(2))
     model.add(Activation('softmax'))
 
     return model

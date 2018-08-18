@@ -7,6 +7,7 @@ from random import shuffle
 
 import numpy as np
 from keras.preprocessing.image import img_to_array, load_img
+from keras.utils import to_categorical
 
 
 def load_images_into_array(directory, pic_size=(28, 28), sample_size=-1):
@@ -72,6 +73,7 @@ def load_train_valid_test_arrays(classes_dict, directory='dataset/'):
         y2 = np.array([i] * classes_dict[class_][1])
         y3 = np.array([i] * classes_dict[class_][2])
 
+
         y_train.append(y1)
         y_valid.append(y2)
         y_test.append(y3)
@@ -85,5 +87,9 @@ def load_train_valid_test_arrays(classes_dict, directory='dataset/'):
     y_train = np.concatenate(y_train, axis=0)
     y_valid = np.concatenate(y_valid, axis=0)
     y_test = np.concatenate(y_test, axis=0)
+
+    y_train = to_categorical(y_train, num_classes=2)
+    y_valid = to_categorical(y_valid, num_classes=2)
+    y_test = to_categorical(y_test, num_classes=2)
 
     return x_train, y_train, x_valid, y_valid, x_test, y_test
