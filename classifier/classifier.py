@@ -12,7 +12,7 @@ from keras.models import Sequential
 from keras.preprocessing.image import ImageDataGenerator
 
 import config
-from classifier import classfication_stats
+from classifier import classification_stats
 
 
 def train_classifier(home_path, option, folder, img_width, img_height, nb_train_samples, nb_validation_samples, epochs,
@@ -66,7 +66,7 @@ def train_classifier(home_path, option, folder, img_width, img_height, nb_train_
                                   callbacks=[csv_logger],
                                   verbose=False)
 
-    classfication_stats.save_plots(history, option, folder)
+    classification_stats.save_plots(history, option, folder)
     model.save(path_model)
 
 

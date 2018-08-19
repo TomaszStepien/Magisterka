@@ -9,7 +9,7 @@ import tensorflow as tf
 import config
 import gans.dcgan as dc_gan
 import load_data as dl
-from classifier import classfication_stats
+from classifier import classification_stats
 from classifier import classifier
 from src.tools import processing
 
@@ -135,11 +135,28 @@ if __name__ == "__main__":
 
     if config.FLAG_TEST_CLASSIFICATION:
         processing_time = processing.start_process('testing classification')
-        for index, option in enumerate(config.DATASETS_LIST):
+        for option in config.DATASETS_LIST:
             for letters in config.LETTERS:
                 model_name = f"{option}_{letters[0]}_{letters[1]}_model"
-                images_path = os.path.join(config.PATH_CLASS_LETTERS, f"{option}", f"{letters[0]}_{letters[1]}/test",
-                                           "")
+                images_path = os.path.join(config.PATH_CLASS_LETTERS, f"{option}", f"{letters[0]}_{letters[1]}",
+                                           "test", "")
                 model_path = os.path.join(config.PATH_MODELS_CLASS, f"{model_name}.h5")
-                classfication_stats.save_roc(images_path=images_path, model_path=model_path, model_name=model_name)
+                classification_stats.save_roc(images_path=images_path, model_path=model_path, model_name=model_name)
         processing.end_process(processing_time, 'testing classification')
+
+    if config.FLAG_TEST_CLASSIFICATION_COMPARE_OPTIONS:
+        processing_time = processing.start_process('testing classification - compare options')
+
+        models_list = processing.return_all_files(config.PATH_MODELS_CLASS)
+        models_dict = dict()
+        letters = list(set([f"{model.split('_')[-3]}_{model.split('_')[-2]}" for model in models_list]))
+        for model in models_list:
+            for l in letters:
+                if l not in models_dict.keys():
+                    models_dict[l] = []
+                if l in model:
+                    models_dict[l].append(['_'.join(model.split('_')[:-3]), model.split('.')[0]])
+
+        for letters in models_dict.keys():
+            classification_stats.save_roc_all_options(letters, models_dict[letters])
+        processing.end_process(processing_time, 'testing classification - compare options')

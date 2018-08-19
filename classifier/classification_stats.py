@@ -9,6 +9,7 @@ from sklearn.metrics import roc_curve
 os.chdir('C:\\Users\\Karolina\\Documents\\[PRACA]\\Magisterka\\')
 from keras.preprocessing.image import ImageDataGenerator
 import config
+from collections import defaultdict
 
 
 def save_roc(images_path, model_path, model_name):
@@ -44,6 +45,55 @@ def save_roc(images_path, model_path, model_name):
     plt.title(f"ROC curve for {model_name} (zoomed in at top left)")
     plt.legend(loc='best')
     plt.savefig(os.path.join(config.PATH_STATS_CLASS_ROC, f"{model_name}_zoomed.png"))
+    plt.close()
+
+
+def save_roc_all_options(letters_keys, models_list):
+    letters = letters_keys.split('_')
+    models_dict = defaultdict(dict)
+    for model in models_list:
+        models_dict[model[0]]['model'] = load_model(
+            os.path.join(config.PATH_MODELS_CLASS, f"{model[1]}.h5"))
+        models_dict[model[0]]['images_path'] = os.path.join(config.PATH_CLASS_LETTERS, f"{model[0]}",
+                                                            f"{letters[0]}_{letters[1]}", "test", "")
+        models_dict[model[0]]['images_labels'] = _get_files_labels(models_dict[model[0]]['images_path'])
+
+        datagen = ImageDataGenerator(rescale=1. / 255)
+        generator = datagen.flow_from_directory(models_dict[model[0]]['images_path'],
+                                                batch_size=config.BATCH_SIZE, target_size=config.PIC_SIZE,
+                                                classes=None, shuffle=False)
+        st_per_set = int(np.floor(len(models_dict[model[0]]['images_labels']) / config.BATCH_SIZE))
+        test_data_features = models_dict[model[0]]['model'].predict_generator(generator, steps=st_per_set,
+                                                                              use_multiprocessing=False, verbose=1)
+        models_dict[model[0]]['stats'] = roc_curve(models_dict[model[0]]['images_labels'], test_data_features,
+                                                   pos_label=1)
+        models_dict[model[0]]['auc'] = auc(models_dict[model[0]]['stats'][0], models_dict[model[0]]['stats'][1])
+
+    plt.figure()
+    plt.plot([0, 1], [0, 1], 'k--')
+    for model in models_list:
+        plt.plot(models_dict[model[0]]['stats'][0], models_dict[model[0]]['stats'][1],
+                 label=f"AUC {model[0]}" + '(area = {:.3f})'.format(models_dict[model[0]]['auc']))
+    plt.xlabel('False positive rate')
+    plt.ylabel('True positive rate')
+    plt.title(f"ROC curve for {letters[0]} {letters[1]}")
+    plt.legend(loc='best')
+    plt.savefig(os.path.join(config.PATH_STATS_CLASS_ROC, f"{letters[0]}_{letters[1]}_compare_roc.png"))
+    plt.close()
+
+    # Zoom in view of the upper left corner.
+    plt.figure()
+    plt.xlim(0, 0.4)
+    plt.ylim(0.6, 1)
+    plt.plot([0, 1], [0, 1], 'k--')
+    for model in models_list:
+        plt.plot(models_dict[model[0]]['stats'][0], models_dict[model[0]]['stats'][1],
+                 label=f"AUC {model[0]}" + '(area = {:.3f})'.format(models_dict[model[0]]['auc']))
+    plt.xlabel('False positive rate')
+    plt.ylabel('True positive rate')
+    plt.title(f"ROC curve for {letters[0]} {letters[1]} (zoomed in at top left)")
+    plt.legend(loc='best')
+    plt.savefig(os.path.join(config.PATH_STATS_CLASS_ROC, f"{letters[0]}_{letters[1]}_compared_zoomed.png"))
     plt.close()
 
 

@@ -13,7 +13,8 @@ FLAG_PREPARE_DATASETS = False
 FLAG_TRAIN_GAN = False
 FLAG_GENERATE_IMAGES = False
 FLAG_CLASSIFY = False
-FLAG_TEST_CLASSIFICATION = True
+FLAG_TEST_CLASSIFICATION = False
+FLAG_TEST_CLASSIFICATION_COMPARE_OPTIONS = True
 
 # create folder structure
 if sys.platform.startswith('linux'):
@@ -34,6 +35,7 @@ DATASET_MAX = 1000
 DATASETS_LIST = [f"{str(DATASET_MAX)}_{str(DATASET_MAX)}",
                  f"{str(DATASET_MAX)}_{str(int(DATASET_MAX/2))}",
                  f"{str(DATASET_MAX)}_{str(int(DATASET_MAX*0.1))}"]
+
 DATASETS_OPTIONS = [[DATASET_MAX, DATASET_MAX], [DATASET_MAX, DATASET_MAX / 2], [DATASET_MAX, DATASET_MAX * 0.1]]
 
 PATH_FINAL_DATA = os.path.join(home, 'MASTER_DATA')
