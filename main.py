@@ -9,6 +9,7 @@ import tensorflow as tf
 import config
 import gans.dcgan as dc_gan
 import load_data as dl
+from classifier import classfication_stats
 from classifier import classifier
 from src.tools import processing
 
@@ -23,10 +24,6 @@ def train_gans(option):
     x_train, _, _, _ = dl.load_sets(path=config.PATH_GAN_LETTERS,
                                     sample_size=(int(option[1]), 100),
                                     classes_to_read=[f"{option[1]}_{letters[1]}"])
-    # CUDA settings
-    c = tf.ConfigProto()
-    c.gpu_options.allow_growth = True
-    # session = tf.Session(config=c)
 
     # Train GAN
     dcgan = dc_gan.DCGAN(pic_size=config.PIC_SIZE,
@@ -100,6 +97,11 @@ def classify_images(path, option, folder):
 
 if __name__ == "__main__":
 
+    # CUDA settings
+    c = tf.ConfigProto()
+    c.gpu_options.allow_growth = True
+    session = tf.Session(config=c)
+
     if config.FLAG_PREPARE_DATASETS:
         processing_time = processing.start_process('datasets preparation')
         for letters in config.LETTERS:
@@ -133,4 +135,11 @@ if __name__ == "__main__":
 
     if config.FLAG_TEST_CLASSIFICATION:
         processing_time = processing.start_process('testing classification')
+        for index, option in enumerate(config.DATASETS_LIST):
+            for letters in config.LETTERS:
+                model_name = f"{option}_{letters[0]}_{letters[1]}_model"
+                images_path = os.path.join(config.PATH_CLASS_LETTERS, f"{option}", f"{letters[0]}_{letters[1]}/test",
+                                           "")
+                model_path = os.path.join(config.PATH_MODELS_CLASS, f"{model_name}.h5")
+                classfication_stats.save_roc(images_path=images_path, model_path=model_path, model_name=model_name)
         processing.end_process(processing_time, 'testing classification')

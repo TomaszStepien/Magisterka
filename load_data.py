@@ -141,6 +141,8 @@ def prepare_final_datasets(letters):
     _prepare_folder(config.PATH_FINAL_DATA)
     _prepare_folder(config.PATH_ROOT)
     _prepare_folder(config.PATH_STATS)
+    _prepare_folder(config.PATH_STATS_CLASS_ROC)
+    _prepare_folder(config.PATH_STATS_CLASS_ACC)
     _prepare_folder(config.PATH_STATS_GAN)
     _prepare_folder(config.PATH_GAN_LETTERS)
     _prepare_folder(config.PATH_CLASS_LETTERS)

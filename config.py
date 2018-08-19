@@ -9,10 +9,10 @@ import os
 import sys
 
 # setup flags
-FLAG_PREPARE_DATASETS = True
+FLAG_PREPARE_DATASETS = False
 FLAG_TRAIN_GAN = False
 FLAG_GENERATE_IMAGES = False
-FLAG_CLASSIFY = True
+FLAG_CLASSIFY = False
 FLAG_TEST_CLASSIFICATION = True
 
 # create folder structure
@@ -39,6 +39,8 @@ DATASETS_OPTIONS = [[DATASET_MAX, DATASET_MAX], [DATASET_MAX, DATASET_MAX / 2], 
 PATH_FINAL_DATA = os.path.join(home, 'MASTER_DATA')
 PATH_ROOT = os.path.join(PATH_FINAL_DATA, 'root')
 PATH_STATS = os.path.join(PATH_FINAL_DATA, 'stats_class')
+PATH_STATS_CLASS_ROC = os.path.join(PATH_STATS, 'roc')
+PATH_STATS_CLASS_ACC = os.path.join(PATH_STATS, 'accuracy')
 PATH_STATS_GAN = os.path.join(PATH_FINAL_DATA, 'stats_gan')
 PATH_MODELS_CLASS = os.path.join(PATH_FINAL_DATA, 'models_class')
 PATH_GAN_LETTERS = os.path.join(PATH_ROOT, 'GAN')
@@ -82,7 +84,7 @@ CHANNELS = 3
 NUM_CLASSES = 1
 
 # gan model parameters
-EPOCHS_GAN = 10000
+EPOCHS_GAN = 10
 EPOCHS_CLASS = 5
 BATCH_SIZE = 16
 SAMPLE_INTERVAL = 10

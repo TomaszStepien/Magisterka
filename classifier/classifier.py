@@ -4,7 +4,6 @@
 
 import os
 
-import tensorflow as tf
 from keras import backend as K
 from keras.callbacks import CSVLogger
 from keras.layers import Activation, Dropout, Flatten, Dense
@@ -13,7 +12,7 @@ from keras.models import Sequential
 from keras.preprocessing.image import ImageDataGenerator
 
 import config
-from classifier import classfication_plots
+from classifier import classfication_stats
 
 
 def train_classifier(home_path, option, folder, img_width, img_height, nb_train_samples, nb_validation_samples, epochs,
@@ -30,10 +29,6 @@ def train_classifier(home_path, option, folder, img_width, img_height, nb_train_
     :param epochs:
     :param batch_size:
     """
-    # (Ustawienia do CUDA)
-    cf = tf.ConfigProto()
-    cf.gpu_options.allow_growth = True
-
     if K.image_data_format() == 'channels_first':
         input_shape = (3, img_width, img_height)
     else:
@@ -71,7 +66,7 @@ def train_classifier(home_path, option, folder, img_width, img_height, nb_train_
                                   callbacks=[csv_logger],
                                   verbose=False)
 
-    classfication_plots.save_plots(history, os.path.join(config.PATH_STATS), option, folder)
+    classfication_stats.save_plots(history, option, folder)
     model.save(path_model)
 
 
