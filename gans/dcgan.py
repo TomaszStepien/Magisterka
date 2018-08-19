@@ -7,7 +7,7 @@ from __future__ import print_function, division
 import csv
 import datetime
 
-import matplotlib.image
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 from keras.layers import BatchNormalization, Activation, ZeroPadding2D
@@ -40,19 +40,19 @@ class DCGAN:
         # Build and compile the discriminator
         self.discriminator = self.build_discriminator()
 
-        # For the combined model we will only train the generator
-        self.discriminator.trainable = False
-
         self.discriminator.compile(loss='binary_crossentropy',
                                    optimizer=optimizer,
                                    metrics=['accuracy'])
 
         # Build the generator
-        self.generator = self.build_generator()
+        self.generator = self.build_generator(pic_size)
 
         # The generator takes noise as input and generates imgs
         z = Input(shape=(100,))
         img = self.generator(z)
+
+        # For the combined model we will only train the generator
+        self.discriminator.trainable = False
 
         # The discriminator takes generated images as input and determines validity
         valid = self.discriminator(img)
@@ -62,7 +62,7 @@ class DCGAN:
         self.combined = Model(z, valid)
         self.combined.compile(loss='binary_crossentropy', optimizer=optimizer)
 
-    def build_generator(self):
+    def build_generator(self, pic_size=config.PIC_SIZE):
         """
 
         :return: 
@@ -122,7 +122,7 @@ class DCGAN:
 
         return Model(img, validity)
 
-    def train(self, x_train, epochs, batch_size=128, save_interval=50, stats_path='gan_output.csv'):
+    def train(self, x_train, epochs, batch_size=128, save_interval=500, stats_path='gan_output.csv', name=""):
         """
 
         :param x_train:
@@ -178,10 +178,10 @@ class DCGAN:
 
             # If at save interval => save generated image samples
             if epoch % save_interval == 0:
-                self.save_imgs(path=images_path, epoch=epoch)
+                self.save_imgs(path=images_path, name=name, epoch=epoch)
                 self.save_model(path=models_path)
 
-    def save_imgs(self, path, epoch=1, full=False, amount=100, r=5, c=5):
+    def save_imgs(self, path, name, epoch=1, full=False, amount=100, r=5, c=5):
         """
         Function for generating set of images from pretrained model or
         to control photo during training (r x c array of images)
@@ -197,7 +197,7 @@ class DCGAN:
             noise = np.random.normal(0, 1, (amount, self.latent_dim))
             gen_imgs = self.generator.predict(noise)
             for i in range(amount):
-                matplotlib.image.imsave(f"{path}/GAN_{i}.png", gen_imgs[i, :, :, 0])
+                matplotlib.image.imsave(f"{path}/{name}_GAN_{i}.png", gen_imgs[i, :, :, 0], cmap='gray')
                 print(f"SAVED: GAN_{i}.png")
         else:
             noise = np.random.normal(0, 1, (r * c, self.latent_dim))
@@ -211,7 +211,7 @@ class DCGAN:
                     axs[i, j].imshow(gen_imgs[cnt, :, :, 0], cmap='gray')
                     axs[i, j].axis('off')
                     cnt += 1
-            fig.savefig(f"{path}/{epoch}.png")
+            fig.savefig(f"{path}/{name}_{epoch}.png")
             plt.close()
 
     @staticmethod

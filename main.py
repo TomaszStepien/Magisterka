@@ -23,7 +23,7 @@ def train_gans(option):
     # Convert images to numpy arrays
     x_train, _, _, _ = dl.load_sets(path=config.PATH_GAN_LETTERS,
                                     sample_size=(int(option[1]), 100),
-                                    classes_to_read=[f"{option[1]}_{letters[1]}"])
+                                    classes_to_read=[f"{option[1]}_{letters[0]}"])
 
     # Train GAN
     dcgan = dc_gan.DCGAN(pic_size=config.PIC_SIZE,
@@ -32,7 +32,8 @@ def train_gans(option):
                 epochs=config.EPOCHS_GAN,
                 batch_size=config.BATCH_SIZE,
                 save_interval=config.SAMPLE_INTERVAL,
-                stats_path=os.path.join(config.PATH_STATS_GAN, f"{option[1]}_{letters[1]}.csv"))
+                stats_path=os.path.join(config.PATH_STATS_GAN, f"{option[1]}_{letters[0]}.csv"),
+                name=f"{option[1]}_{letters[0]}")
     return dcgan
 
 
@@ -49,7 +50,7 @@ def generate_images(option, dcgan):
                                       f"{letters[0]}_{letters[1]}",
                                       'generated', letters[1])
 
-    dcgan.save_imgs(path=path_second_letter, full=True, amount=option[1])
+    dcgan.save_imgs(path=path_second_letter, full=True, amount=option[1], name=f"{option[1]}_{letters[1]}")
 
     dl.train_validation_dividing(source_path=path_first_letter,
                                  destination_path=os.path.join(config.PATH_CLASS_LETTERS,

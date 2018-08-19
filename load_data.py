@@ -162,8 +162,8 @@ def prepare_final_datasets(letters):
     for letter in letters:
         """ Prepare list of letters which will be moved copied into folders """
         letters_all = processing.return_all_files(os.path.join(config.DATA_PATH, letter))
-        letters_dict[letter]['max'] = random.sample(letters_all, int(config.DATASET_MAX + config.DATASET_MAX * 0.2))
-        letters_dict[letter]['test'] = random.sample(letters_dict[letter]['max'], int(config.DATASET_MAX * 0.2))
+        letters_dict[letter]['max'] = random.sample(letters_all, int(config.DATASET_MAX + config.DATASET_MAX * 0.1))
+        letters_dict[letter]['test'] = random.sample(letters_dict[letter]['max'], int(config.DATASET_MAX * 0.1))
 
         letters_dict[letter]['max'] = list(set(letters_dict[letter]['max']) - set(letters_dict[letter]['test']))
         letters_dict[letter]['half'] = random.sample(letters_dict[letter]['max'], int(config.DATASET_MAX / 2))

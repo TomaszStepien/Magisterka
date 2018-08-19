@@ -9,12 +9,12 @@ import os
 import sys
 
 # setup flags
-FLAG_PREPARE_DATASETS = False
-FLAG_TRAIN_GAN = False
-FLAG_GENERATE_IMAGES = False
+FLAG_PREPARE_DATASETS = True
+FLAG_TRAIN_GAN = True
+FLAG_GENERATE_IMAGES = True
 FLAG_CLASSIFY = False
 FLAG_TEST_CLASSIFICATION = False
-FLAG_TEST_CLASSIFICATION_COMPARE_OPTIONS = True
+FLAG_TEST_CLASSIFICATION_COMPARE_OPTIONS = False
 
 # create folder structure
 if sys.platform.startswith('linux'):
@@ -30,8 +30,10 @@ SAVED_MODELS = home + 'saved_files/saved_models/'
 CLASS_DATA_PATH = home + 'notMNIST_training/'
 STATS_FILES = home + 'saved_files/stats_files/'
 
-LETTERS = [['A', 'D'], ['G', 'C'], ['I', 'J']]
-DATASET_MAX = 1000
+LETTERS = [['soccer', 'yinyang']]
+# LETTERS = [['A', 'D'], ['G', 'C'], ['I', 'J']]
+
+DATASET_MAX = 600
 DATASETS_LIST = [f"{str(DATASET_MAX)}_{str(DATASET_MAX)}",
                  f"{str(DATASET_MAX)}_{str(int(DATASET_MAX/2))}",
                  f"{str(DATASET_MAX)}_{str(int(DATASET_MAX*0.1))}"]
@@ -86,8 +88,8 @@ CHANNELS = 3
 NUM_CLASSES = 1
 
 # gan model parameters
-EPOCHS_GAN = 10
+EPOCHS_GAN = 100001
 EPOCHS_CLASS = 5
 BATCH_SIZE = 16
-SAMPLE_INTERVAL = 10
+SAMPLE_INTERVAL = 500
 PROPORTION = 0.7
